@@ -1,9 +1,7 @@
 'use client';
 
-import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { Beer, Gift } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import {
     Card,
     CardContent,
@@ -67,7 +65,7 @@ export default function Dashboard() {
                                 )}
                                 <h3 className="font-semibold mb-2">打卡記錄：</h3>
                                 <ul className="space-y-2">
-                                    {checkins.map((checkin, index) => (
+                                    {checkins.map((checkin: any, index: number) => (
                                         <li key={index} className="bg-white p-2 rounded shadow">
                                             {checkin.barName} -{' '}
                                             {new Date(checkin.timestamp).toLocaleString()}

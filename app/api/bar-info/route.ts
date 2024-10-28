@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 
 // 這裡應該是從數據庫中獲取酒吧信息
 // 這只是一個模擬的數據
-const bars = {
+const bars: any = {
     '1': { id: '1', name: 'Cozy Bar' },
     '2': { id: '2', name: 'Happy Hour Pub' },
     '3': { id: '3', name: 'Nightowl Lounge' }
