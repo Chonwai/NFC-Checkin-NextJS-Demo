@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/card';
 
 import { getBar } from '@/lib/bars';
+import { addCheckin, Checkin } from '@/lib/storage'; // 添加此行
 
 export default function CheckinContent() {
     const router = useRouter();
@@ -41,6 +42,9 @@ export default function CheckinContent() {
             });
 
             if (response.ok) {
+                const data = await response.json();
+                const newCheckin: Checkin = data.checkin;
+                addCheckin(newCheckin); // 將打卡數據保存至 localStorage
                 setIsCheckedIn(true);
             } else {
                 setError('打卡失敗，請稍後再試');

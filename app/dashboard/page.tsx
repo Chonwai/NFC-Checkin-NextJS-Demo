@@ -11,24 +11,17 @@ import {
     CardTitle
 } from '@/components/ui/card';
 import Header from '../components/Header';
+import { getCheckins, Checkin } from '@/lib/storage';
 
 export default function Dashboard() {
-    const [checkins, setCheckins] = useState([]);
+    const [checkins, setCheckins] = useState<Checkin[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        const fetchCheckins = async () => {
-            try {
-                const response = await fetch('/api/checkins');
-                if (response.ok) {
-                    const data = await response.json();
-                    setCheckins(data.checkins);
-                }
-            } catch (error) {
-                console.error('Failed to fetch checkins:', error);
-            } finally {
-                setIsLoading(false);
-            }
+        const fetchCheckins = () => {
+            const storedCheckins = getCheckins();
+            setCheckins(storedCheckins);
+            setIsLoading(false);
         };
 
         fetchCheckins();
@@ -65,7 +58,7 @@ export default function Dashboard() {
                                 )}
                                 <h3 className="font-semibold mb-2">打卡記錄：</h3>
                                 <ul className="space-y-2">
-                                    {checkins.map((checkin: any, index: number) => (
+                                    {checkins.map((checkin: Checkin, index: number) => (
                                         <li key={index} className="bg-white p-2 rounded shadow">
                                             {checkin.barName} -{' '}
                                             {new Date(checkin.timestamp).toLocaleString()}
