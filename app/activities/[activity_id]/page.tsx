@@ -24,14 +24,17 @@ import { getDeviceId } from '@/lib/fingerprint';
 import { useState, useEffect } from 'react';
 
 interface ActivityDetailsProps {
-    params: {
-        activity_id: string;
-    };
+    params: Promise<{ activity_id: string }>;
 }
 
 export default function ActivityDetails({ params }: ActivityDetailsProps) {
-    const { activity_id } = params;
-    const { activity, isLoading, error } = useActivity(activity_id);
+    const [activityId, setActivityId] = useState<string | null>(null);
+
+    useEffect(() => {
+        params.then(({ activity_id }) => setActivityId(activity_id));
+    }, [params]);
+
+    const { activity, isLoading, error } = useActivity(activityId);
     const router = useRouter();
 
     const [deviceId, setDeviceId] = useState<string | null>(null);
@@ -39,7 +42,7 @@ export default function ActivityDetails({ params }: ActivityDetailsProps) {
         checkins,
         isLoading: isCheckinsLoading,
         error: checkinsError
-    } = useListCheckins(activity_id, deviceId);
+    } = useListCheckins(activityId, deviceId);
 
     useEffect(() => {
         const fetchDeviceId = async () => {
