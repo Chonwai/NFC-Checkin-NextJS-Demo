@@ -1,7 +1,7 @@
 'use client';
 
 import React, { Suspense } from 'react';
-import Header from '../components/Header';
+import Header from '../../components/Header';
 import CheckinContent from './CheckinContent';
 
 export default function Checkin() {

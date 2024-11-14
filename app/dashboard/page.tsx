@@ -10,7 +10,7 @@ import {
     CardHeader,
     CardTitle
 } from '@/components/ui/card';
-import Header from '../components/Header';
+import Header from '../../components/Header';
 import { getCheckins, Checkin } from '@/lib/storage';
 
 export default function Dashboard() {

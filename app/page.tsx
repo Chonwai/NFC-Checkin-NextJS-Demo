@@ -1,4 +1,7 @@
+'use client';
+
 import Link from 'next/link';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
     Card,
@@ -8,27 +11,41 @@ import {
     CardHeader,
     CardTitle
 } from '@/components/ui/card';
-import Header from './components/Header';
+import Header from '../components/Header';
+import { useActivities } from '@/hooks/useActivities';
 
 export default function Home() {
+    const { activities, isLoading, error } = useActivities();
+
     return (
         <div className="min-h-screen bg-gray-100">
             <Header />
             <main className="container mx-auto px-4 py-8">
                 <Card className="w-full max-w-2xl mx-auto">
                     <CardHeader>
-                        <CardTitle>歡迎參加 Cozy Life 2.0 NFC 打卡活動！</CardTitle>
-                        <CardDescription>在不同酒吧打卡，收集印章並贏取獎品！</CardDescription>
+                        <CardTitle>活動列表</CardTitle>
+                        <CardDescription>以下是目前進行中的活動：</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <p className="mb-4">活動流程：</p>
-                        <ol className="list-decimal list-inside space-y-2 mb-4">
-                            <li>訪問參與的酒吧</li>
-                            <li>將手機靠近 NFC 標籤</li>
-                            <li>確認打卡並獲得印章</li>
-                            <li>收集足夠印章即可參與抽獎</li>
-                        </ol>
-                        <p>每次打卡還可獲得當日酒水9折優惠！</p>
+                        {isLoading ? (
+                            <p>載入中...</p>
+                        ) : error ? (
+                            <p className="text-red-500">發生錯誤：{error}</p>
+                        ) : (
+                            <ul className="space-y-2">
+                                {activities.map((activity) => (
+                                    <li key={activity.id} className="bg-white p-4 rounded shadow">
+                                        <Link legacyBehavior href={`/activities/${activity.id}`}>
+                                            <a className="block cursor-pointer hover:bg-gray-50 transition">
+                                                <h3 className="font-semibold">{activity.name}</h3>
+                                                <p>{activity.description}</p>
+                                            </a>
+                                        </Link>
+                                        {/* 可以根據需求添加更多活動相關資訊 */}
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
                     </CardContent>
                     <CardFooter>
                         <Link href="/dashboard" className="w-full">
