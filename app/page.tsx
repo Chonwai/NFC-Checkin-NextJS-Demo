@@ -35,7 +35,7 @@ export default function Home() {
                             <ul className="space-y-2">
                                 {activities.map((activity) => (
                                     <li key={activity.id} className="bg-white p-4 rounded shadow">
-                                        <Link legacyBehavior href={`/activities/${activity.id}`}>
+                                        <Link href={`/activities/${activity.id}`} legacyBehavior>
                                             <a className="block cursor-pointer hover:bg-gray-50 transition">
                                                 <h3 className="font-semibold">{activity.name}</h3>
                                                 <p>{activity.description}</p>
@@ -48,7 +48,7 @@ export default function Home() {
                         )}
                     </CardContent>
                     <CardFooter>
-                        <Link href="/dashboard" className="w-full">
+                        <Link href="/my-checkins" className="w-full">
                             <Button className="w-full">查看我的印章</Button>
                         </Link>
                     </CardFooter>
