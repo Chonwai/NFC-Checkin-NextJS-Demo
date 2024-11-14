@@ -11,8 +11,8 @@ export default function Header() {
                         </Link>
                     </li>
                     <li>
-                        <Link href="/dashboard" className="hover:underline">
-                            我的印章
+                        <Link href="/my-checkins" className="hover:underline">
+                            打卡記錄
                         </Link>
                     </li>
                 </ul>

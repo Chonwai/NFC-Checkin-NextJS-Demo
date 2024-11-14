@@ -49,7 +49,7 @@ export default function Home() {
                     </CardContent>
                     <CardFooter>
                         <Link href="/my-checkins" className="w-full">
-                            <Button className="w-full">查看我的印章</Button>
+                            <Button className="w-full">查看我的打卡記錄</Button>
                         </Link>
                     </CardFooter>
                 </Card>

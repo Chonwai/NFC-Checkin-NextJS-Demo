@@ -92,7 +92,7 @@ export default function CheckinContent() {
                 )}
                 {(isCheckedIn || error) && (
                     <Button className="w-full" onClick={() => router.push('/dashboard')}>
-                        查看我的印章
+                        查看我的打卡記錄
                     </Button>
                 )}
             </CardFooter>

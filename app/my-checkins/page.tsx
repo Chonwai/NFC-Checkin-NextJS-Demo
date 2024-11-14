@@ -14,6 +14,7 @@ import Header from '@/components/Header';
 import { useAllCheckins } from '@/hooks/useAllCheckins';
 import { getDeviceId } from '@/lib/fingerprint';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 export default function MyCheckins() {
     const router = useRouter();
@@ -46,14 +47,25 @@ export default function MyCheckins() {
                             <ul className="space-y-4">
                                 {checkins.map((item) => (
                                     <li key={item.id} className="bg-white p-4 rounded shadow">
-                                        <h3 className="font-semibold">{item.activity.name}</h3>
-                                        <p>地點：{item.location.name}</p>
-                                        <p>
-                                            時間：
-                                            {new Date(item.check_in.checkin_time).toLocaleString()}
-                                        </p>
-                                        <p>地址：{item.location.address}</p>
-                                        {/* 可以根據需求添加更多資訊 */}
+                                        <Link
+                                            legacyBehavior
+                                            href={`/activities/${item.activity.id}`}
+                                        >
+                                            <a className="block hover:bg-gray-50 transition">
+                                                <h3 className="font-semibold">
+                                                    {item.activity.name}
+                                                </h3>
+                                                <p>地點：{item.location.name}</p>
+                                                <p>
+                                                    時間：
+                                                    {new Date(
+                                                        item.check_in.checkin_time
+                                                    ).toLocaleString()}
+                                                </p>
+                                                <p>地址：{item.location.address}</p>
+                                                {/* 可以根據需求添加更多資訊 */}
+                                            </a>
+                                        </Link>
                                     </li>
                                 ))}
                             </ul>
