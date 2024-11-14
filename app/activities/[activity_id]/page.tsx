@@ -20,7 +20,8 @@ import {
     AccordionContent
 } from '@/components/ui/accordion';
 import { Beer, Gift } from 'lucide-react';
-import { getDeviceId } from '@/lib/device';
+import { getDeviceId } from '@/lib/fingerprint';
+import { useState, useEffect } from 'react';
 
 interface ActivityDetailsProps {
     params: {
@@ -33,18 +34,24 @@ export default function ActivityDetails({ params }: ActivityDetailsProps) {
     const { activity, isLoading, error } = useActivity(activity_id);
     const router = useRouter();
 
-    const deviceId = getDeviceId();
+    const [deviceId, setDeviceId] = useState<string | null>(null);
     const {
         checkins,
         isLoading: isCheckinsLoading,
         error: checkinsError
     } = useListCheckins(activity_id, deviceId);
 
+    useEffect(() => {
+        const fetchDeviceId = async () => {
+            const id = await getDeviceId();
+            setDeviceId(id);
+        };
+        fetchDeviceId();
+    }, []);
+
     const handleGoBack = () => {
         router.back();
     };
-
-    const hasCheckedIn = checkins.length > 0;
 
     return (
         <div className="min-h-screen bg-gray-100">
@@ -81,62 +88,6 @@ export default function ActivityDetails({ params }: ActivityDetailsProps) {
                                     {activity.single_location_only ? '是' : '否'}
                                 </p>
 
-                                {/* 打卡狀態顯示 */}
-                                <div className="mt-4">
-                                    <h2 className="text-xl font-semibold">打卡狀態</h2>
-                                    {isCheckinsLoading ? (
-                                        <p>載入中...</p>
-                                    ) : checkinsError ? (
-                                        <p className="text-red-500">發生錯誤：{checkinsError}</p>
-                                    ) : (
-                                        <div className="flex items-center space-x-2">
-                                            {[...Array(activity.check_in_limit)].map((_, i) => (
-                                                <Beer
-                                                    key={i}
-                                                    className={`w-6 h-6 ${i < checkins.length ? 'text-yellow-500' : 'text-gray-300'}`}
-                                                />
-                                            ))}
-                                        </div>
-                                    )}
-                                    <p className="mt-2">
-                                        已打卡: {checkins.length} / {activity.check_in_limit}
-                                    </p>
-                                    {checkins.length >= activity.check_in_limit && (
-                                        <div className="bg-yellow-100 p-4 rounded-lg text-center mt-2">
-                                            <Gift className="inline-block w-6 h-6 text-yellow-500 mb-2" />
-                                            <p className="font-semibold">
-                                                恭喜！您已達到打卡限制！
-                                            </p>
-                                        </div>
-                                    )}
-                                </div>
-
-                                {/* 打卡記錄 */}
-                                <div className="mt-6">
-                                    <h2 className="text-xl font-semibold mb-2">打卡記錄</h2>
-                                    {isCheckinsLoading ? (
-                                        <p>載入中...</p>
-                                    ) : checkinsError ? (
-                                        <p className="text-red-500">發生錯誤：{checkinsError}</p>
-                                    ) : checkins.length > 0 ? (
-                                        <ul className="space-y-2">
-                                            {checkins.map((checkin: Checkin) => (
-                                                <li
-                                                    key={checkin.id}
-                                                    className="bg-white p-2 rounded shadow"
-                                                >
-                                                    {checkin.barName} -{' '}
-                                                    {new Date(
-                                                        checkin.checkin_time
-                                                    ).toLocaleString()}
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    ) : (
-                                        <p>目前沒有打卡記錄。</p>
-                                    )}
-                                </div>
-
                                 {/* 地點列表 */}
                                 <div className="mt-6">
                                     <h2 className="text-xl font-semibold">地點列表</h2>
@@ -159,6 +110,63 @@ export default function ActivityDetails({ params }: ActivityDetailsProps) {
                                             </AccordionItem>
                                         ))}
                                     </Accordion>
+                                </div>
+
+                                {/* 打卡狀態顯示 */}
+                                <div className="mt-4">
+                                    <h2 className="text-xl font-semibold">打卡狀態</h2>
+                                    {isCheckinsLoading ? (
+                                        <p>載入中...</p>
+                                    ) : checkinsError ? (
+                                        <p className="text-red-500">發生錯誤：{checkinsError}</p>
+                                    ) : (
+                                        <div className="flex items-center space-x-2">
+                                            {[...Array(activity.check_in_limit)].map((_, i) => (
+                                                <Beer
+                                                    key={i}
+                                                    className={`w-6 h-6 ${i < checkins.length ? 'text-yellow-500' : 'text-gray-300'}`}
+                                                />
+                                            ))}
+                                        </div>
+                                    )}
+
+                                    <p className="mt-2">
+                                        已打卡: {checkins.length} / {activity.check_in_limit}
+                                    </p>
+                                    {checkins.length >= activity.check_in_limit && (
+                                        <div className="bg-yellow-100 p-4 rounded-lg text-center mt-2">
+                                            <Gift className="inline-block w-6 h-6 text-yellow-500 mb-2" />
+                                            <p className="font-semibold">
+                                                恭喜！您已達到打卡限制！
+                                            </p>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* 打卡記錄 */}
+                                <div className="mt-6">
+                                    <h2 className="text-xl font-semibold mb-2">打卡記錄</h2>
+                                    {isCheckinsLoading ? (
+                                        <p>載入中...</p>
+                                    ) : checkinsError ? (
+                                        <p className="text-red-500">發生錯誤：{checkinsError}</p>
+                                    ) : checkins.length > 0 ? (
+                                        <ul className="space-y-2">
+                                            {checkins.map((checkin: any) => (
+                                                <li
+                                                    key={checkin.id}
+                                                    className="bg-white p-2 rounded shadow"
+                                                >
+                                                    {checkin.barName} -{' '}
+                                                    {new Date(
+                                                        checkin.checkin_time
+                                                    ).toLocaleString()}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    ) : (
+                                        <p>目前沒有打卡記錄。</p>
+                                    )}
                                 </div>
                             </div>
                         ) : (

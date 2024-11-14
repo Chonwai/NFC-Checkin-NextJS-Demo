@@ -14,16 +14,26 @@ import {
 } from '@/components/ui/card';
 
 import { getBar } from '@/lib/bars';
-import { addCheckin, Checkin } from '@/lib/storage'; // 添加此行
+import { addCheckin, Checkin } from '@/lib/storage';
+import { getDeviceId } from '@/lib/fingerprint';
 
 export default function CheckinContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const [isCheckedIn, setIsCheckedIn] = useState(false);
     const [error, setError] = useState('');
+    const [deviceId, setDeviceId] = useState<string | null>(null);
 
     const barId = searchParams.get('bar_id');
     const bar = barId ? getBar(barId) : null;
+
+    useEffect(() => {
+        const fetchDeviceId = async () => {
+            const id = await getDeviceId();
+            setDeviceId(id);
+        };
+        fetchDeviceId();
+    }, []);
 
     useEffect(() => {
         if (!bar) {
@@ -32,13 +42,13 @@ export default function CheckinContent() {
     }, [bar]);
 
     const handleCheckin = async () => {
-        if (!bar) return;
+        if (!bar || !deviceId) return;
 
         try {
             const response = await fetch('/api/checkin', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ barId: bar.id, barName: bar.name })
+                body: JSON.stringify({ barId: bar.id, barName: bar.name, deviceId })
             });
 
             if (response.ok) {
