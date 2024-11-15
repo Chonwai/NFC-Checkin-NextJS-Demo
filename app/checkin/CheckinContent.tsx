@@ -1,7 +1,7 @@
 // app/checkin/CheckinContent.tsx
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import {
@@ -12,20 +12,18 @@ import {
     CardHeader,
     CardTitle
 } from '@/components/ui/card';
-
-import { getBar } from '@/lib/bars';
-import { addCheckin, Checkin } from '@/lib/storage';
 import { getDeviceId } from '@/lib/fingerprint';
+import { useCheckin } from '@/hooks/useCheckin';
 
 export default function CheckinContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const [isCheckedIn, setIsCheckedIn] = useState(false);
-    const [error, setError] = useState('');
     const [deviceId, setDeviceId] = useState<string | null>(null);
+    const { createCheckin, isLoading, error, isSuccess } = useCheckin();
 
-    const barId = searchParams.get('bar_id');
-    const bar = barId ? getBar(barId) : null;
+    const activityId = searchParams.get('activity_id');
+    const locationId = searchParams.get('location_id');
+    const locationName = searchParams.get('location_name');
 
     useEffect(() => {
         const fetchDeviceId = async () => {
@@ -36,62 +34,48 @@ export default function CheckinContent() {
     }, []);
 
     useEffect(() => {
-        if (!bar) {
-            setError('無效的 NFC 標籤數據');
+        if (!activityId || !locationId) {
+            router.push('/');
         }
-    }, [bar]);
+    }, [activityId, locationId, router]);
 
     const handleCheckin = async () => {
-        if (!bar || !deviceId) return;
-
-        try {
-            const response = await fetch('/api/checkin', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ barId: bar.id, barName: bar.name, deviceId })
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-                const newCheckin: Checkin = data.checkin;
-                addCheckin(newCheckin); // 將打卡數據保存至 localStorage
-                setIsCheckedIn(true);
-            } else {
-                setError('打卡失敗，請稍後再試');
-            }
-        } catch (err) {
-            console.error(err);
-            setError('發生錯誤，請稍後再試');
-        }
+        if (!activityId || !locationId || !deviceId) return;
+        await createCheckin(activityId, locationId, deviceId);
     };
 
     return (
         <Card className="w-full max-w-md mx-auto">
             <CardHeader>
-                <CardTitle>Cozy Life 2.0 打卡</CardTitle>
-                <CardDescription>{bar ? `在 ${bar.name} 打卡` : '打卡地點'}</CardDescription>
+                <CardTitle>活動打卡</CardTitle>
+                <CardDescription>
+                    {locationName ? `在 ${locationName} 打卡` : '打卡地點'}
+                </CardDescription>
             </CardHeader>
             <CardContent>
                 {error ? (
                     <p className="text-red-500">{error}</p>
-                ) : isCheckedIn ? (
+                ) : isSuccess ? (
                     <div className="text-center">
                         <p className="text-2xl mb-2">✅</p>
                         <p className="text-xl font-semibold">打卡成功！</p>
-                        <p className="mt-2">您已獲得一個新印章和今日酒水9折優惠。</p>
                     </div>
                 ) : (
-                    <p>準備在 {bar?.name} 打卡嗎？點擊下方按鈕確認。</p>
+                    <p>準備在 {locationName} 打卡嗎？點擊下方按鈕確認。</p>
                 )}
             </CardContent>
             <CardFooter>
-                {!isCheckedIn && !error && (
-                    <Button className="w-full" onClick={handleCheckin}>
-                        確認打卡
+                {!isSuccess && !error && (
+                    <Button 
+                        className="w-full" 
+                        onClick={handleCheckin}
+                        disabled={isLoading}
+                    >
+                        {isLoading ? '處理中...' : '確認打卡'}
                     </Button>
                 )}
-                {(isCheckedIn || error) && (
-                    <Button className="w-full" onClick={() => router.push('/dashboard')}>
+                {(isSuccess || error) && (
+                    <Button className="w-full" onClick={() => router.push('/my-checkins')}>
                         查看我的打卡記錄
                     </Button>
                 )}
