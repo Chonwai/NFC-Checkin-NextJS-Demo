@@ -10,17 +10,18 @@ interface CheckinData {
     device_id: string;
 }
 
-interface CheckinResponse extends ApiResponse<{
-    check_in: {
-        id: string;
-        temp_user_id: string;
-        location_id: string;
-        checkin_time: string;
-        meta: Record<string, any>;
-        created_at: string;
-        updated_at: string;
-    };
-}> {}
+interface CheckinResponse
+    extends ApiResponse<{
+        check_in: {
+            id: string;
+            temp_user_id: string;
+            location_id: string;
+            checkin_time: string;
+            meta: Record<string, any>;
+            created_at: string;
+            updated_at: string;
+        };
+    }> {}
 
 interface UseCheckinResult {
     createCheckin: (activityId: string, locationId: string, deviceId: string) => Promise<void>;
@@ -38,22 +39,20 @@ export function useCheckin(): UseCheckinResult {
         setIsLoading(true);
         setError(null);
         try {
-            const response = await fetch(
-                `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/activities/${activityId}/check_ins`,
-                {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Temp-User-Token': deviceId
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/check_ins`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Temp-User-Token': deviceId
+                },
+                body: JSON.stringify({
+                    check_in: {
+                        location_id: locationId,
+                        activity_id: activityId
                     },
-                    body: JSON.stringify({
-                        check_in: {
-                            location_id: locationId
-                        },
-                        device_id: deviceId
-                    })
-                }
-            );
+                    device_id: deviceId
+                })
+            });
 
             const data: CheckinResponse = await response.json();
             if (data.success && data.data) {
