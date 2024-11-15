@@ -1,11 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { ApiResponse } from '@/types/api';
 
-interface CheckinResponse {
-    success: boolean;
-    check_ins: Checkin[];
-}
+interface CheckinResponse
+    extends ApiResponse<{
+        check_ins: Checkin[];
+    }> {}
 
 interface Checkin {
     id: string;
@@ -53,10 +54,10 @@ export function useListCheckins(
                 }
 
                 const data: CheckinResponse = await response.json();
-                if (data.success) {
-                    setCheckins(data.check_ins);
+                if (data.success && data.data) {
+                    setCheckins(data.data.check_ins);
                 } else {
-                    throw new Error('無法獲取打卡資訊');
+                    throw new Error(data.error?.message || '無法獲取打卡資訊');
                 }
             } catch (err: any) {
                 setError(err.message || '未知錯誤');

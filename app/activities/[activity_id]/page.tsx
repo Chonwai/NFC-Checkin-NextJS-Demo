@@ -69,7 +69,7 @@ export default function ActivityDetails({ params }: ActivityDetailsProps) {
                         {isLoading ? (
                             <p>載入中...</p>
                         ) : error ? (
-                            <p className="text-red-500">發生錯誤：{error}</p>
+                            <p className="text-red-500">{error}</p>
                         ) : activity ? (
                             <div>
                                 <h1 className="text-2xl font-bold mb-2">{activity.name}</h1>
@@ -121,7 +121,7 @@ export default function ActivityDetails({ params }: ActivityDetailsProps) {
                                     {isCheckinsLoading ? (
                                         <p>載入中...</p>
                                     ) : checkinsError ? (
-                                        <p className="text-red-500">發生錯誤：{checkinsError}</p>
+                                        <p className="text-red-500">{checkinsError}</p>
                                     ) : (
                                         <div className="flex items-center space-x-2">
                                             {[...Array(activity.check_in_limit)].map((_, i) => (
@@ -152,7 +152,7 @@ export default function ActivityDetails({ params }: ActivityDetailsProps) {
                                     {isCheckinsLoading ? (
                                         <p>載入中...</p>
                                     ) : checkinsError ? (
-                                        <p className="text-red-500">發生錯誤：{checkinsError}</p>
+                                        <p className="text-red-500">{checkinsError}</p>
                                     ) : checkins.length > 0 ? (
                                         <ul className="space-y-2">
                                             {checkins.map((checkin: any) => (

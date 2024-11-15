@@ -1,11 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { ApiResponse } from '@/types/api';
 
-interface ActivityDetailsResponse {
-    success: boolean;
-    activity: Activity;
-}
+interface ActivityDetailsResponse
+    extends ApiResponse<{
+        activity: Activity;
+    }> {}
 
 interface Activity {
     id: string;
@@ -64,10 +65,10 @@ export function useActivity(activityId: string | null): UseActivityResult {
                 }
 
                 const data: ActivityDetailsResponse = await response.json();
-                if (data.success) {
-                    setActivity(data.activity);
+                if (data.success && data.data) {
+                    setActivity(data.data.activity);
                 } else {
-                    throw new Error('無法獲取活動資訊');
+                    throw new Error(data.error?.message || '無法獲取活動資訊');
                 }
             } catch (err: any) {
                 setError(err.message || '未知錯誤');

@@ -30,7 +30,7 @@ export default function Home() {
                         {isLoading ? (
                             <p>載入中...</p>
                         ) : error ? (
-                            <p className="text-red-500">發生錯誤：{error}</p>
+                            <p className="text-red-500">{error}</p>
                         ) : (
                             <ul className="space-y-2">
                                 {activities.map((activity) => (

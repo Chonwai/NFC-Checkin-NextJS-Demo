@@ -42,7 +42,7 @@ export default function MyCheckins() {
                         {isLoading ? (
                             <p>載入中...</p>
                         ) : error ? (
-                            <p className="text-red-500">發生錯誤：{error}</p>
+                            <p className="text-red-500">{error}</p>
                         ) : checkins.length > 0 ? (
                             <ul className="space-y-4">
                                 {checkins.map((item) => (
