@@ -12,7 +12,6 @@ interface Activity {
     id: string;
     name: string;
     description: string;
-    // 其他相關欄位
 }
 
 interface UseActivitiesResult {
