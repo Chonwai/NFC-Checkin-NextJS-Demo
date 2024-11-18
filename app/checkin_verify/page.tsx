@@ -51,8 +51,8 @@ export default function CheckinVerify() {
 
     useEffect(() => {
         if (error) {
-            console.log('error: ', error);
-            router.push('/checkin_error');
+            const encodedError = encodeURIComponent(error);
+            router.push(`/checkin_error?message=${encodedError}`);
         }
     }, [error, router]);
 

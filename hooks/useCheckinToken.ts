@@ -21,6 +21,17 @@ interface CheckinWithTokenResponse
         };
     }> {}
 
+interface ErrorResponse {
+    message: string;
+    code: string;
+    details?: string[];
+}
+
+interface ApiErrorResponse {
+    success: false;
+    error: ErrorResponse;
+}
+
 interface UseCheckinTokenResult {
     performCheckin: (activityId: string, locationId: string, deviceId: string) => Promise<void>;
     isLoading: boolean;
@@ -87,11 +98,15 @@ export function useCheckinToken(): UseCheckinTokenResult {
                 throw new Error(`Error: ${checkinResponse.status} ${checkinResponse.statusText}`);
             }
 
-            const checkinData: CheckinWithTokenResponse = await checkinResponse.json();
-            if (checkinData.success) {
-                setIsSuccess(true);
-            } else {
-                throw new Error(checkinData.error?.message || '打卡失敗');
+            const checkinData: CheckinWithTokenResponse | ApiErrorResponse =
+                await checkinResponse.json();
+            if (!checkinData.success) {
+                const errorDetails = (checkinData as ApiErrorResponse).error.details;
+                const errorMessage =
+                    errorDetails && errorDetails.length > 0
+                        ? errorDetails[0]
+                        : (checkinData as ApiErrorResponse).error.message;
+                throw new Error(errorMessage || '打卡失敗');
             }
 
             console.log('checkinData: ', checkinData);
