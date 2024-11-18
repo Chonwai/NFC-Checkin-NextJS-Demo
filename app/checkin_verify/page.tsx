@@ -45,9 +45,9 @@ export default function CheckinVerify() {
 
     useEffect(() => {
         if (isSuccess) {
-            router.push('/checkin_success');
+            router.push(`/checkin_success?activity_id=${activityId}&location_id=${locationId}`);
         }
-    }, [isSuccess, router]);
+    }, [isSuccess, router, activityId, locationId]);
 
     useEffect(() => {
         if (error) {
