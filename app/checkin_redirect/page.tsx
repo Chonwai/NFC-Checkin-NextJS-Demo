@@ -11,7 +11,7 @@ import {
     CardFooter,
     CardTitle
 } from '@/components/ui/card';
-
+import Header from '@/components/Header';
 import { getDeviceId } from '@/lib/fingerprint';
 
 export default function CheckinRedirect() {
@@ -57,20 +57,25 @@ export default function CheckinRedirect() {
     }, [error, router]);
 
     return (
-        <Card className="w-full max-w-md mx-auto mt-10">
-            <CardHeader>
-                <CardTitle>打卡中...</CardTitle>
-                <CardDescription>請稍候，正在完成您的打卡操作。</CardDescription>
-            </CardHeader>
-            <CardContent>
-                <p>目前正在處理您的打卡請求，請勿關閉此頁面。</p>
-                {isLoading && <p>打卡中...</p>}
-            </CardContent>
-            <CardFooter>
-                <p className="text-center text-sm text-gray-500 w-full">
-                    正在完成打卡操作，請稍候。
-                </p>
-            </CardFooter>
-        </Card>
+        <div className="min-h-screen bg-gray-100">
+            <Header />
+            <main className="container mx-auto px-4 py-8">
+                <Card className="w-full max-w-md mx-auto">
+                    <CardHeader>
+                        <CardTitle>打卡中...</CardTitle>
+                        <CardDescription>請稍候，正在完成您的打卡操作。</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <p>目前正在處理您的打卡請求，請勿關閉此頁面。</p>
+                        {isLoading && <p>打卡中...</p>}
+                    </CardContent>
+                    <CardFooter>
+                        <p className="text-center text-sm text-gray-500 w-full">
+                            正在完成打卡操作，請稍候。
+                        </p>
+                    </CardFooter>
+                </Card>
+            </main>
+        </div>
     );
 }
