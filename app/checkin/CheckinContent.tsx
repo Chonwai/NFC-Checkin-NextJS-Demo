@@ -12,15 +12,13 @@ import {
     CardHeader,
     CardTitle
 } from '@/components/ui/card';
-import { getDeviceId } from '@/lib/fingerprint';
-import { useCheckin } from '@/hooks/useCheckin';
 import { useActivity } from '@/hooks/useActivity';
+import { getDeviceId } from '@/lib/fingerprint';
 
 export default function CheckinContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const [deviceId, setDeviceId] = useState<string | null>(null);
-    const { createCheckin, isLoading, error, isSuccess } = useCheckin();
 
     const activityId = searchParams.get('activity_id');
     const locationId = searchParams.get('location_id');
@@ -59,16 +57,18 @@ export default function CheckinContent() {
         }
     }, [activity, locationId]);
 
-    const handleCheckin = async () => {
-        if (!activityId || !locationId || !deviceId) return;
-        await createCheckin(activityId, locationId, deviceId);
-    };
+    // 當用戶訪問 CheckinContent 時，自動重定向到 CheckinRedirect 頁面
+    useEffect(() => {
+        if (activityId && locationId && deviceId) {
+            router.push(`/checkin_redirect?activity_id=${activityId}&location_id=${locationId}`);
+        }
+    }, [activityId, locationId, deviceId, router]);
 
     if (isActivityLoading) {
         return (
-            <Card className="w-full max-w-md mx-auto">
+            <Card className="w-full max-w-md mx-auto mt-10">
                 <CardHeader>
-                    <CardTitle>{activity?.name} 活動打卡</CardTitle>
+                    <CardTitle>活動打卡</CardTitle>
                     <CardDescription>載入中...</CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -80,9 +80,9 @@ export default function CheckinContent() {
 
     if (activityError) {
         return (
-            <Card className="w-full max-w-md mx-auto">
+            <Card className="w-full max-w-md mx-auto mt-10">
                 <CardHeader>
-                    <CardTitle>{activity?.name} 活動打卡</CardTitle>
+                    <CardTitle>活動打卡</CardTitle>
                     <CardDescription>發生錯誤</CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -98,9 +98,9 @@ export default function CheckinContent() {
     }
 
     return (
-        <Card className="w-full max-w-md mx-auto">
+        <Card className="w-full max-w-md mx-auto mt-10">
             <CardHeader>
-                <CardTitle>{activity?.name} 活動打卡</CardTitle>
+                <CardTitle>活動打卡</CardTitle>
                 <CardDescription>
                     {locationName ? `在 ${locationName} 打卡` : '打卡地點'}
                 </CardDescription>
@@ -112,28 +112,11 @@ export default function CheckinContent() {
                         <p>{activity.description}</p>
                     </div>
                 )}
-                {error ? (
-                    <p className="text-red-500">{error}</p>
-                ) : isSuccess ? (
-                    <div className="text-center">
-                        <p className="text-2xl mb-2">✅</p>
-                        <p className="text-xl font-semibold">打卡成功！</p>
-                    </div>
-                ) : (
-                    <p>準備在 {locationName} 打卡嗎？點擊下方按鈕確認。</p>
-                )}
             </CardContent>
             <CardFooter>
-                {!isSuccess && !error && (
-                    <Button className="w-full" onClick={handleCheckin} disabled={isLoading}>
-                        {isLoading ? '處理中...' : '確認打卡'}
-                    </Button>
-                )}
-                {(isSuccess || error) && (
-                    <Button className="w-full" onClick={() => router.push('/my-checkins')}>
-                        查看我的打卡記錄
-                    </Button>
-                )}
+                <p className="text-center text-sm text-gray-500 w-full">
+                    您將被自動重定向以完成打卡操作。
+                </p>
             </CardFooter>
         </Card>
     );
