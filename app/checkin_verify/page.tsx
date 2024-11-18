@@ -14,7 +14,7 @@ import {
 import Header from '@/components/Header';
 import { getDeviceId } from '@/lib/fingerprint';
 
-export default function CheckinRedirect() {
+export default function CheckinVerify() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const { performCheckin, isLoading, error, isSuccess } = useCheckinToken();

@@ -57,10 +57,10 @@ export default function CheckinContent() {
         }
     }, [activity, locationId]);
 
-    // 當用戶訪問 CheckinContent 時，自動重定向到 CheckinRedirect 頁面
+    // 當用戶訪問 CheckinContent 時，自動重定向到 CheckinVerify 頁面
     useEffect(() => {
         if (activityId && locationId && deviceId) {
-            router.push(`/checkin_redirect?activity_id=${activityId}&location_id=${locationId}`);
+            router.push(`/checkin_verify?activity_id=${activityId}&location_id=${locationId}`);
         }
     }, [activityId, locationId, deviceId, router]);
 
