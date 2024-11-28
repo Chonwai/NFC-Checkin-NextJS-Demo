@@ -123,25 +123,69 @@ export default function ActivityDetails({ params }: ActivityDetailsProps) {
                                     ) : checkinsError ? (
                                         <p className="text-red-500">{checkinsError}</p>
                                     ) : (
-                                        <div className="grid grid-cols-12 gap-2">
-                                            {[...Array(activity.check_in_limit)].map((_, i) => (
-                                                <Beer
-                                                    key={i}
-                                                    className={`w-6 h-6 ${i < checkins.length ? 'text-yellow-500' : 'text-gray-300'}`}
-                                                />
-                                            ))}
-                                        </div>
-                                    )}
+                                        <div>
+                                            {activity.single_location_only ? (
+                                                // 單一地點模式
+                                                <div className="grid grid-cols-12 gap-2">
+                                                    {[...Array(activity.check_in_limit)].map(
+                                                        (_, i) => (
+                                                            <Beer
+                                                                key={i}
+                                                                className={`w-6 h-6 ${
+                                                                    i < checkins.length
+                                                                        ? 'text-yellow-500'
+                                                                        : 'text-gray-300'
+                                                                }`}
+                                                            />
+                                                        )
+                                                    )}
+                                                </div>
+                                            ) : (
+                                                // 多地點模式
+                                                <div className="space-y-2">
+                                                    {activity.locations.map((location) => {
+                                                        const locationCheckins = checkins.filter(
+                                                            (checkin) =>
+                                                                checkin.location_id === location.id
+                                                        );
+                                                        return (
+                                                            <div
+                                                                key={location.id}
+                                                                className="flex items-center gap-4"
+                                                            >
+                                                                <span className="min-w-[120px] text-sm">
+                                                                    {location.name}
+                                                                </span>
+                                                                <Beer
+                                                                    className={`w-6 h-6 ${
+                                                                        locationCheckins.length > 0
+                                                                            ? 'text-yellow-500'
+                                                                            : 'text-gray-300'
+                                                                    }`}
+                                                                />
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
+                                            )}
 
-                                    <p className="mt-2">
-                                        已打卡: {checkins.length} / {activity.check_in_limit}
-                                    </p>
-                                    {checkins.length >= activity.check_in_limit && (
-                                        <div className="bg-yellow-100 p-4 rounded-lg text-center mt-2">
-                                            <Gift className="inline-block w-6 h-6 text-yellow-500 mb-2" />
-                                            <p className="font-semibold">
-                                                恭喜！您已達到打卡限制！
+                                            <p className="mt-2">
+                                                已打卡: {checkins.length} /
+                                                {activity.single_location_only
+                                                    ? activity.check_in_limit
+                                                    : activity.locations.length}
                                             </p>
+
+                                            {activity.single_location_only
+                                                ? checkins.length >= activity.check_in_limit
+                                                : checkins.length >= activity.locations.length && (
+                                                      <div className="bg-yellow-100 p-4 rounded-lg text-center mt-2">
+                                                          <Gift className="inline-block w-6 h-6 text-yellow-500 mb-2" />
+                                                          <p className="font-semibold">
+                                                              恭喜！您已完成所有打卡！
+                                                          </p>
+                                                      </div>
+                                                  )}
                                         </div>
                                     )}
                                 </div>
