@@ -20,6 +20,7 @@ interface Activity {
     check_in_limit: number;
     single_location_only: boolean;
     locations: Location[];
+    is_active: boolean;
 }
 
 interface Location {
