@@ -3,8 +3,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useDashboardStats } from '@/hooks/admin/useDashboardStats';
 import { useActivitiesData } from '@/hooks/admin/useActivitiesData';
-import { Activity, Users, CheckSquare, TrendingUp, Clock } from 'lucide-react';
+import { Activity, Users, CheckSquare, TrendingUp, Clock, MapPin } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useLocationsData } from '@/hooks/admin/useLocationsData';
+import { useUserActivityTrend } from '@/hooks/admin/useUserActivityTrend';
 
 export default function AdminDashboard() {
     const { stats, isLoading, error } = useDashboardStats();
@@ -13,6 +15,16 @@ export default function AdminDashboard() {
         isLoading: activitiesDataLoading,
         error: activitiesDataError
     } = useActivitiesData();
+    const {
+        locationsData,
+        isLoading: locationsDataLoading,
+        error: locationsDataError
+    } = useLocationsData();
+    const {
+        trendData,
+        isLoading: trendDataLoading,
+        error: trendDataError
+    } = useUserActivityTrend();
 
     if (isLoading) {
         return <div>載入中...</div>;
@@ -166,15 +178,34 @@ export default function AdminDashboard() {
                     <TabsContent value="locations">
                         <Card>
                             <CardHeader>
-                                <CardTitle className="text-lg">熱門打卡地點排行</CardTitle>
+                                <CardTitle className="text-lg flex items-center gap-2">
+                                    <MapPin className="h-5 w-5" />
+                                    熱門打卡地點排行
+                                </CardTitle>
                             </CardHeader>
                             <CardContent>
                                 <div className="space-y-4">
-                                    {/* 這裡可以放地點排行列表 */}
-                                    <div className="flex items-center justify-between p-2 bg-muted rounded">
-                                        <div>地點 A</div>
-                                        <div className="text-muted-foreground">打卡次數：123</div>
-                                    </div>
+                                    {locationsData.map((location, index) => (
+                                        <div
+                                            key={index}
+                                            className="flex items-center justify-between p-4 bg-muted rounded-lg hover:bg-muted/80 transition-colors"
+                                        >
+                                            <div className="space-y-1">
+                                                <div className="font-medium">{location.name}</div>
+                                                <div className="text-sm text-muted-foreground">
+                                                    獨立用戶數：{location.unique_users}
+                                                </div>
+                                            </div>
+                                            <div className="text-right">
+                                                <div className="font-bold">
+                                                    {location.check_in_count}
+                                                </div>
+                                                <div className="text-sm text-muted-foreground">
+                                                    打卡次數
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
                                 </div>
                             </CardContent>
                         </Card>
@@ -183,41 +214,105 @@ export default function AdminDashboard() {
                     <TabsContent value="users">
                         <Card>
                             <CardHeader>
-                                <CardTitle className="text-lg">用戶活躍度分析</CardTitle>
+                                <CardTitle className="text-lg flex items-center gap-2">
+                                    <Users className="h-5 w-5" />
+                                    用戶活躍度分析
+                                </CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <div className="space-y-4">
+                                <div className="space-y-6">
                                     <div className="grid grid-cols-3 gap-4">
                                         <Card>
-                                            <CardHeader>
+                                            <CardHeader className="pb-2">
                                                 <CardTitle className="text-sm">
                                                     日活躍用戶
                                                 </CardTitle>
                                             </CardHeader>
                                             <CardContent>
-                                                <div className="text-2xl font-bold">123</div>
+                                                <div className="text-2xl font-bold">
+                                                    {trendData[0]?.active_users || 0}
+                                                </div>
+                                                <p className="text-xs text-muted-foreground">
+                                                    新增用戶：{trendData[0]?.new_users || 0}
+                                                </p>
                                             </CardContent>
                                         </Card>
                                         <Card>
-                                            <CardHeader>
+                                            <CardHeader className="pb-2">
                                                 <CardTitle className="text-sm">
                                                     週活躍用戶
                                                 </CardTitle>
                                             </CardHeader>
                                             <CardContent>
-                                                <div className="text-2xl font-bold">456</div>
+                                                <div className="text-2xl font-bold">
+                                                    {trendData
+                                                        .slice(0, 7)
+                                                        .reduce(
+                                                            (sum, day) => sum + day.active_users,
+                                                            0
+                                                        )}
+                                                </div>
+                                                <p className="text-xs text-muted-foreground">
+                                                    週新增：
+                                                    {trendData
+                                                        .slice(0, 7)
+                                                        .reduce(
+                                                            (sum, day) => sum + day.new_users,
+                                                            0
+                                                        )}
+                                                </p>
                                             </CardContent>
                                         </Card>
                                         <Card>
-                                            <CardHeader>
+                                            <CardHeader className="pb-2">
                                                 <CardTitle className="text-sm">
                                                     月活躍用戶
                                                 </CardTitle>
                                             </CardHeader>
                                             <CardContent>
-                                                <div className="text-2xl font-bold">789</div>
+                                                <div className="text-2xl font-bold">
+                                                    {trendData
+                                                        .slice(0, 30)
+                                                        .reduce(
+                                                            (sum, day) => sum + day.active_users,
+                                                            0
+                                                        )}
+                                                </div>
+                                                <p className="text-xs text-muted-foreground">
+                                                    月新增：
+                                                    {trendData
+                                                        .slice(0, 30)
+                                                        .reduce(
+                                                            (sum, day) => sum + day.new_users,
+                                                            0
+                                                        )}
+                                                </p>
                                             </CardContent>
                                         </Card>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <h3 className="text-sm font-medium">最近活躍記錄</h3>
+                                        <div className="space-y-2">
+                                            {trendData.slice(0, 7).map((day, index) => (
+                                                <div
+                                                    key={day.date}
+                                                    className="flex items-center justify-between p-2 bg-muted rounded"
+                                                >
+                                                    <div className="text-sm">
+                                                        {new Date(day.date).toLocaleDateString()}
+                                                    </div>
+                                                    <div className="flex gap-4">
+                                                        <span className="text-sm">
+                                                            活躍：{day.active_users}
+                                                        </span>
+                                                        <span className="text-sm text-green-600">
+                                                            新增：+{day.new_users}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
                                     </div>
                                 </div>
                             </CardContent>
