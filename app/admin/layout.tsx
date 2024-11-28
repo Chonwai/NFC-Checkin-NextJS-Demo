@@ -15,11 +15,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         {
             title: '概覽',
             items: [
-                { name: '儀表板', icon: <LayoutDashboard className="w-4 h-4" />, href: '/admin' },
+                {
+                    name: '儀表板',
+                    icon: <LayoutDashboard className="w-4 h-4" />,
+                    href: '/admin#dashboard-stats'
+                },
                 {
                     name: '數據分析',
                     icon: <BarChart className="w-4 h-4" />,
-                    href: '/admin/analytics'
+                    href: '/admin#dashboard-analytics'
                 }
             ]
         },

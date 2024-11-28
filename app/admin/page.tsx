@@ -38,7 +38,7 @@ export default function AdminDashboard() {
         <div className="space-y-6">
             <h1 className="text-3xl font-bold">管理員儀表板</h1>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div id="dashboard-stats" className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">總活動數</CardTitle>
@@ -84,7 +84,7 @@ export default function AdminDashboard() {
                 {stats?.stats_updated_at ? new Date(stats.stats_updated_at).toLocaleString() : '-'}
             </div>
 
-            <div className="grid grid-cols-1 gap-6">
+            <div id="dashboard-analytics" className="grid grid-cols-1 gap-6">
                 <Tabs defaultValue="activity" className="w-full">
                     <TabsList className="grid w-full grid-cols-3 mb-4">
                         <TabsTrigger className="py-2" value="activity">

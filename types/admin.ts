@@ -139,3 +139,114 @@ export interface CreateActivityResponse {
         message: string;
     };
 }
+
+export interface AdminLocationsResponse {
+    success: boolean;
+    data?: {
+        locations: AdminLocation[];
+    };
+    error?: {
+        message: string;
+    };
+}
+
+export interface CreateLocationPayload {
+    location: {
+        name: string;
+        description: string;
+        address: string;
+        activity_id: string;
+    };
+}
+
+export interface CreateLocationResponse {
+    success: boolean;
+    data?: {
+        location: AdminLocation;
+    };
+    error?: {
+        message: string;
+    };
+}
+
+export interface UpdateLocationPayload {
+    location: Partial<{
+        name: string;
+        description: string;
+        address: string;
+        activity_id: string;
+    }>;
+}
+
+export interface LocationResponse {
+    success: boolean;
+    data?: {
+        location: AdminLocation;
+    };
+    error?: {
+        message: string;
+    };
+}
+
+export interface TimeDistributionResponse {
+    success: boolean;
+    data?: {
+        hourly_distribution: Record<string, number>;
+        weekly_distribution: Record<string, number>;
+    };
+    error?: {
+        message: string;
+    };
+}
+
+export interface UserBehaviorStat {
+    id: string;
+    total_check_ins: number;
+    first_check_in: string;
+    last_check_in: string;
+    duration: number;
+}
+
+export interface UserBehaviorResponse {
+    success: boolean;
+    data?: {
+        user_behavior_stats: UserBehaviorStat[];
+    };
+    error?: {
+        message: string;
+    };
+}
+
+export interface LocationHeatMapItem {
+    name: string;
+    check_in_count: number;
+    unique_users: number;
+    avg_check_in_hour: string;
+    id: string | null;
+}
+
+export interface LocationHeatMapResponse {
+    success: boolean;
+    data?: {
+        location_heat_map: LocationHeatMapItem[];
+    };
+    error?: {
+        message: string;
+    };
+}
+
+export interface CompletionTrendItem {
+    activity_name: string;
+    total_users: number;
+    completion_rate: number;
+}
+
+export interface CompletionTrendResponse {
+    success: boolean;
+    data?: {
+        completion_trend: CompletionTrendItem[];
+    };
+    error?: {
+        message: string;
+    };
+}
