@@ -117,13 +117,13 @@ export default function ActivityDetails({ params }: ActivityDetailsProps) {
 
                                 {/* 打卡狀態顯示 */}
                                 <div className="mt-4">
-                                    <h2 className="text-xl font-semibold">打卡狀態</h2>
+                                    <h2 className="text-xl font-semibold mb-2">打卡狀態</h2>
                                     {isCheckinsLoading ? (
                                         <p>載入中...</p>
                                     ) : checkinsError ? (
                                         <p className="text-red-500">{checkinsError}</p>
                                     ) : (
-                                        <div className="flex items-center space-x-2">
+                                        <div className="grid grid-cols-12 gap-2">
                                             {[...Array(activity.check_in_limit)].map((_, i) => (
                                                 <Beer
                                                     key={i}

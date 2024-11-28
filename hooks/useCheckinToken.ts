@@ -109,7 +109,7 @@ export function useCheckinToken(): UseCheckinTokenResult {
                 throw new Error(errorMessage || '打卡失敗');
             }
 
-            console.log('checkinData: ', checkinData);
+            setIsSuccess(true);
         } catch (err: any) {
             setError(err.message || '未知錯誤');
             setIsSuccess(false);
