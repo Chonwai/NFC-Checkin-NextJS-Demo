@@ -5,16 +5,17 @@ import {
     Toast,
     ToastClose,
     ToastDescription,
+    ToastProps,
     ToastProvider,
     ToastTitle,
     ToastViewport
 } from '@/components/ui/toast';
 
-export function Toaster() {
+export function Toaster({ ...props }: ToastProps) {
     const { toasts } = useToast();
 
     return (
-        <ToastProvider>
+        <ToastProvider {...props} swipeDirection="left">
             {toasts.map(function ({ id, title, description, action, ...props }) {
                 return (
                     <Toast key={id} {...props}>

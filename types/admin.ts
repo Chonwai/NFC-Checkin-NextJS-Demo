@@ -78,3 +78,64 @@ export interface TrendDataResponse {
         message: string;
     };
 }
+
+export interface AdminActivity {
+    id: string;
+    name: string;
+    description: string;
+    start_date: string;
+    end_date: string;
+    meta: Record<string, any>;
+    created_at: string;
+    updated_at: string;
+    check_in_limit: number;
+    single_location_only: boolean;
+    is_active: boolean;
+    locations: AdminLocation[];
+}
+
+export interface AdminLocation {
+    id: string;
+    name: string;
+    description: string;
+    activity_id: string;
+    address: string;
+    meta: Record<string, any>;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface AdminActivitiesResponse {
+    success: boolean;
+    data?: {
+        activities: AdminActivity[];
+    };
+    error?: {
+        message: string;
+    };
+}
+
+export interface CreateActivityPayload {
+    activity: {
+        name: string;
+        description: string;
+        start_date: string;
+        end_date: string;
+        check_in_limit: number;
+        single_location_only: boolean;
+        is_active: boolean;
+    };
+}
+
+export interface CreateActivityResponse {
+    success: boolean;
+    data?: {
+        activity: {
+            id: string;
+            name: string;
+        };
+    };
+    error?: {
+        message: string;
+    };
+}
