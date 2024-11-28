@@ -23,3 +23,25 @@ export interface DashboardResponse {
         message: string;
     };
 }
+
+export interface ActivityData {
+    name: string;
+    total_users: number;
+    total_check_ins: number;
+    completion_stats: {
+        full_completion_rate: number;
+        partial_completion_rate: number;
+    };
+    active_days: number;
+    status: string;
+}
+
+export interface ActivitiesDataResponse {
+    success: boolean;
+    data?: {
+        activities_data: ActivityData[];
+    };
+    error?: {
+        message: string;
+    };
+}

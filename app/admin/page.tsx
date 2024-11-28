@@ -2,11 +2,17 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useDashboardStats } from '@/hooks/admin/useDashboardStats';
-import { Activity, Users, CheckSquare, TrendingUp } from 'lucide-react';
+import { useActivitiesData } from '@/hooks/admin/useActivitiesData';
+import { Activity, Users, CheckSquare, TrendingUp, Clock } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export default function AdminDashboard() {
     const { stats, isLoading, error } = useDashboardStats();
+    const {
+        activitiesData,
+        isLoading: activitiesDataLoading,
+        error: activitiesDataError
+    } = useActivitiesData();
 
     if (isLoading) {
         return <div>載入中...</div>;
@@ -83,8 +89,75 @@ export default function AdminDashboard() {
                                 </CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <div className="h-[300px] flex items-center justify-center text-muted-foreground">
-                                    圖表區域：顯示每個活動的打卡次數、完成率等數據
+                                <div className="space-y-4">
+                                    {activitiesData.map((activity, index) => (
+                                        <div key={index} className="border rounded-lg p-4">
+                                            <div className="flex justify-between items-center mb-2">
+                                                <h3 className="font-semibold">{activity.name}</h3>
+                                                <span
+                                                    className={`px-2 py-1 rounded text-sm ${
+                                                        activity.status === '進行中'
+                                                            ? 'bg-green-100 text-green-800'
+                                                            : 'bg-gray-100 text-gray-800'
+                                                    }`}
+                                                >
+                                                    {activity.status}
+                                                </span>
+                                            </div>
+                                            <div className="grid grid-cols-4 gap-4 mt-2">
+                                                <div>
+                                                    <p className="text-sm text-gray-500">
+                                                        參與人數
+                                                    </p>
+                                                    <p className="text-lg font-semibold">
+                                                        {activity.total_users}
+                                                    </p>
+                                                </div>
+                                                <div>
+                                                    <p className="text-sm text-gray-500">
+                                                        打卡次數
+                                                    </p>
+                                                    <p className="text-lg font-semibold">
+                                                        {activity.total_check_ins}
+                                                    </p>
+                                                </div>
+                                                <div>
+                                                    <p className="text-sm text-gray-500">
+                                                        完整完成率
+                                                    </p>
+                                                    <p className="text-lg font-semibold">
+                                                        {
+                                                            activity.completion_stats
+                                                                .full_completion_rate
+                                                        }
+                                                        %
+                                                    </p>
+                                                </div>
+                                                <div>
+                                                    <p className="text-sm text-gray-500">
+                                                        部分完成率
+                                                    </p>
+                                                    <p className="text-lg font-semibold">
+                                                        {
+                                                            activity.completion_stats
+                                                                .partial_completion_rate
+                                                        }
+                                                        %
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div className="mt-2 flex items-center text-sm text-gray-500">
+                                                <Clock className="h-4 w-4 mr-1" />
+                                                <span>
+                                                    活動天數：
+                                                    {Math.ceil(
+                                                        activity.active_days / (24 * 60 * 60)
+                                                    )}{' '}
+                                                    天
+                                                </span>
+                                            </div>
+                                        </div>
+                                    ))}
                                 </div>
                             </CardContent>
                         </Card>
