@@ -18,7 +18,7 @@ export function useDashboardStats(): UseDashboardStatsResult {
     useEffect(() => {
         const fetchDashboardStats = async () => {
             try {
-                const data: DashboardResponse = await adminFetch('/api/admin/dashboard');
+                const data: DashboardResponse = await adminFetch('/api/admin/dashboard/stats');
                 if (data.success && data.data) {
                     setStats(data.data.dashboard);
                 } else {
