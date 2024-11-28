@@ -46,29 +46,29 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     href: '/admin/checkins'
                 }
             ]
-        },
-        {
-            title: '用戶管理',
-            items: [
-                { name: '用戶列表', icon: <Users className="w-4 h-4" />, href: '/admin/users' },
-                {
-                    name: '權限設置',
-                    icon: <Settings className="w-4 h-4" />,
-                    href: '/admin/permissions'
-                }
-            ]
-        },
-        {
-            title: '系統',
-            items: [
-                {
-                    name: '系統設置',
-                    icon: <Settings className="w-4 h-4" />,
-                    href: '/admin/settings'
-                },
-                { name: '操作日誌', icon: <FileText className="w-4 h-4" />, href: '/admin/logs' }
-            ]
         }
+        // {
+        //     title: '用戶管理',
+        //     items: [
+        //         { name: '用戶列表', icon: <Users className="w-4 h-4" />, href: '/admin/users' },
+        //         {
+        //             name: '權限設置',
+        //             icon: <Settings className="w-4 h-4" />,
+        //             href: '/admin/permissions'
+        //         }
+        //     ]
+        // },
+        // {
+        //     title: '系統',
+        //     items: [
+        //         {
+        //             name: '系統設置',
+        //             icon: <Settings className="w-4 h-4" />,
+        //             href: '/admin/settings'
+        //         },
+        //         { name: '操作日誌', icon: <FileText className="w-4 h-4" />, href: '/admin/logs' }
+        //     ]
+        // }
     ];
 
     return (
