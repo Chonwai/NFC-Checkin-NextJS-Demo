@@ -47,7 +47,7 @@ export default function AdminActivities() {
                                         {activity.description}
                                     </p>
                                 </div>
-                                <div className="flex items-end gap-2">
+                                <div className="flex items-center gap-2">
                                     <Link href={`/admin/activities/${activity.id}/edit`}>
                                         <Button variant="outline" size="sm">
                                             <Pencil className="h-4 w-4 mr-1" />
