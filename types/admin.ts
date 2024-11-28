@@ -137,6 +137,7 @@ export interface CreateActivityResponse {
     };
     error?: {
         message: string;
+        details?: string[];
     };
 }
 

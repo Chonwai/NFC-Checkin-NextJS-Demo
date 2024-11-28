@@ -26,27 +26,28 @@ export default function CreateActivity() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        try {
-            const response = await createActivity({
-                activity: {
-                    ...formData,
-                    start_date: new Date(formData.start_date).toISOString(),
-                    end_date: new Date(formData.end_date).toISOString()
-                }
-            });
-
-            if (response.success && response.data) {
-                toast({
-                    title: '建立成功',
-                    description: `活動「${response.data.activity.name}」已成功建立`,
-                    duration: 3000
-                });
-                router.push('/admin/activities');
+        const response = await createActivity({
+            activity: {
+                ...formData,
+                start_date: new Date(formData.start_date).toISOString(),
+                end_date: new Date(formData.end_date).toISOString()
             }
-        } catch (err: any) {
+        });
+
+        if (response.success && response.data) {
+            toast({
+                title: '建立成功',
+                description: `活動「${response.data.activity.name}」已成功建立`,
+                duration: 3000
+            });
+            router.push('/admin/activities');
+        } else {
+            const errorMessage =
+                response.error?.details?.[0] || response.error?.message || '未知錯誤';
+
             toast({
                 title: '建立失敗',
-                description: err.message || '未知錯誤',
+                description: errorMessage,
                 variant: 'destructive',
                 duration: 3000
             });
