@@ -86,10 +86,16 @@ export default function AdminDashboard() {
 
             <div className="grid grid-cols-1 gap-6">
                 <Tabs defaultValue="activity" className="w-full">
-                    <TabsList className="grid w-full grid-cols-3">
-                        <TabsTrigger value="activity">活動參與分析</TabsTrigger>
-                        <TabsTrigger value="locations">地點分佈</TabsTrigger>
-                        <TabsTrigger value="users">用戶活躍度</TabsTrigger>
+                    <TabsList className="grid w-full grid-cols-3 mb-4">
+                        <TabsTrigger className="py-2" value="activity">
+                            活動參與分析
+                        </TabsTrigger>
+                        <TabsTrigger className="py-2" value="locations">
+                            地點分佈
+                        </TabsTrigger>
+                        <TabsTrigger className="py-2" value="users">
+                            用戶活躍度
+                        </TabsTrigger>
                     </TabsList>
 
                     <TabsContent value="activity">
