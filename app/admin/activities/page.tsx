@@ -3,7 +3,7 @@
 import { useAdminActivities } from '@/hooks/admin/useAdminActivities';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Plus, Calendar, MapPin, CheckSquare } from 'lucide-react';
+import { Plus, Calendar, MapPin, CheckSquare, Pencil } from 'lucide-react';
 import Link from 'next/link';
 
 export default function AdminActivities() {
@@ -33,28 +33,38 @@ export default function AdminActivities() {
                 {activities.map((activity) => (
                     <Card key={activity.id}>
                         <CardHeader className="flex flex-row items-center justify-between space-y-0">
-                            <div>
-                                <CardTitle className="text-xl">
-                                    <Link
-                                        href={`/admin/activities/${activity.id}`}
-                                        className="hover:underline"
-                                    >
-                                        {activity.name}
+                            <div className="w-full flex justify-between items-center">
+                                <div className="w-1/2">
+                                    <CardTitle className="text-xl">
+                                        <Link
+                                            href={`/admin/activities/${activity.id}`}
+                                            className="hover:underline"
+                                        >
+                                            {activity.name}
+                                        </Link>
+                                    </CardTitle>
+                                    <p className="text-sm text-muted-foreground mt-1">
+                                        {activity.description}
+                                    </p>
+                                </div>
+                                <div className="flex items-end gap-2">
+                                    <Link href={`/admin/activities/${activity.id}/edit`}>
+                                        <Button variant="outline" size="sm">
+                                            <Pencil className="h-4 w-4 mr-1" />
+                                            編輯
+                                        </Button>
                                     </Link>
-                                </CardTitle>
-                                <p className="text-sm text-muted-foreground mt-1">
-                                    {activity.description}
-                                </p>
+                                    <span
+                                        className={`px-2 py-1 rounded text-sm ${
+                                            activity.is_active
+                                                ? 'bg-green-100 text-green-800'
+                                                : 'bg-gray-100 text-gray-800'
+                                        }`}
+                                    >
+                                        {activity.is_active ? '進行中' : '已結束'}
+                                    </span>
+                                </div>
                             </div>
-                            <span
-                                className={`px-2 py-1 rounded text-sm ${
-                                    activity.is_active
-                                        ? 'bg-green-100 text-green-800'
-                                        : 'bg-gray-100 text-gray-800'
-                                }`}
-                            >
-                                {activity.is_active ? '進行中' : '已結束'}
-                            </span>
                         </CardHeader>
                         <CardContent>
                             <div className="grid grid-cols-3 gap-4">
