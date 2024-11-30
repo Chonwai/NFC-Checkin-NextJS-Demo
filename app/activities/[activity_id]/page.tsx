@@ -19,9 +19,12 @@ import {
     AccordionTrigger,
     AccordionContent
 } from '@/components/ui/accordion';
-import { Beer, Gift } from 'lucide-react';
+import { Beer, Gift, Star, Calendar, MapPin, ExclamationTriangle } from 'lucide-react';
 import { getDeviceId } from '@/lib/fingerprint';
 import { useState, useEffect } from 'react';
+import { Badge } from '@/components/ui/badge';
+import { ActivityInfoModal } from '@/components/ActivityInfoModal';
+import { CheckinHistoryModal } from '@/components/CheckinHistoryModal';
 
 interface ActivityDetailsProps {
     params: Promise<{ activity_id: string }>;
@@ -57,174 +60,118 @@ export default function ActivityDetails({ params }: ActivityDetailsProps) {
     };
 
     return (
-        <div className="min-h-screen bg-gray-100">
+        <div className="min-h-screen bg-[#00777b]">
             <Header />
             <main className="container mx-auto px-4 py-8">
-                <Card className="w-full max-w-2xl mx-auto">
-                    <CardHeader>
-                        <CardTitle>活動詳情</CardTitle>
-                        <CardDescription>查看活動的詳細資訊</CardDescription>
+                <Card className="w-full max-w-md mx-auto bg-[#f7e7be] border-none shadow-lg">
+                    <CardHeader className="text-center pb-2">
+                        <CardTitle className="text-2xl font-rubik text-[#00777b]">
+                            {activity?.name || '載入中...'}
+                        </CardTitle>
+                        <CardDescription className="text-[#009f92]">
+                            收集印章，獲得獎勵！
+                        </CardDescription>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="space-y-6">
                         {isLoading ? (
-                            <p>載入中...</p>
-                        ) : error ? (
-                            <p className="text-red-500">{error}</p>
-                        ) : activity ? (
-                            <div>
-                                <h1 className="text-2xl font-bold mb-2">{activity.name}</h1>
-                                <p className="mb-4">{activity.description}</p>
-                                <p>
-                                    <strong>開始日期：</strong>
-                                    {new Date(activity.start_date).toLocaleDateString()}
-                                </p>
-                                <p>
-                                    <strong>結束日期：</strong>
-                                    {new Date(activity.end_date).toLocaleDateString()}
-                                </p>
-                                <p>
-                                    <strong>打卡限制：</strong>
-                                    {activity.check_in_limit} 次
-                                </p>
-                                <p>
-                                    <strong>單一地點：</strong>
-                                    {activity.single_location_only ? '是' : '否'}
-                                </p>
-
-                                {/* 地點列表 */}
-                                <div className="mt-6">
-                                    <h2 className="text-xl font-semibold">地點列表</h2>
-                                    <Accordion type="single" collapsible>
-                                        {activity.locations.map((location) => (
-                                            <AccordionItem key={location.id} value={location.id}>
-                                                <AccordionTrigger className="font-semibold">
-                                                    {location.name}
-                                                </AccordionTrigger>
-                                                <AccordionContent>
-                                                    <p>
-                                                        <strong>描述：</strong>
-                                                        {location.description}
-                                                    </p>
-                                                    <p>
-                                                        <strong>地址：</strong>
-                                                        {location.address}
-                                                    </p>
-                                                </AccordionContent>
-                                            </AccordionItem>
-                                        ))}
-                                    </Accordion>
-                                </div>
-
-                                {/* 打卡狀態顯示 */}
-                                <div className="mt-4">
-                                    <h2 className="text-xl font-semibold mb-2">打卡狀態</h2>
-                                    {isCheckinsLoading ? (
-                                        <p>載入中...</p>
-                                    ) : checkinsError ? (
-                                        <p className="text-red-500">{checkinsError}</p>
-                                    ) : (
-                                        <div>
-                                            {activity.single_location_only ? (
-                                                // 單一地點模式
-                                                <div className="grid grid-cols-12 gap-2">
-                                                    {[...Array(activity.check_in_limit)].map(
-                                                        (_, i) => (
-                                                            <Beer
-                                                                key={i}
-                                                                className={`w-6 h-6 ${
-                                                                    i < checkins.length
-                                                                        ? 'text-yellow-500'
-                                                                        : 'text-gray-300'
-                                                                }`}
-                                                            />
-                                                        )
-                                                    )}
-                                                </div>
-                                            ) : (
-                                                // 多地點模式
-                                                <div className="space-y-2">
-                                                    {activity.locations.map((location) => {
-                                                        const locationCheckins = checkins.filter(
-                                                            (checkin) =>
-                                                                checkin.location_id === location.id
-                                                        );
-                                                        return (
-                                                            <div
-                                                                key={location.id}
-                                                                className="flex items-center gap-4"
-                                                            >
-                                                                <span className="min-w-[120px] text-sm">
-                                                                    {location.name}
-                                                                </span>
-                                                                <Beer
-                                                                    className={`w-6 h-6 ${
-                                                                        locationCheckins.length > 0
-                                                                            ? 'text-yellow-500'
-                                                                            : 'text-gray-300'
-                                                                    }`}
-                                                                />
-                                                            </div>
-                                                        );
-                                                    })}
-                                                </div>
-                                            )}
-
-                                            <p className="mt-2">
-                                                已打卡: {checkins.length} /
-                                                {activity.single_location_only
-                                                    ? activity.check_in_limit
-                                                    : activity.locations.length}
-                                            </p>
-
-                                            {activity.single_location_only
-                                                ? checkins.length >= activity.check_in_limit
-                                                : checkins.length >= activity.locations.length && (
-                                                      <div className="bg-yellow-100 p-4 rounded-lg text-center mt-2">
-                                                          <Gift className="inline-block w-6 h-6 text-yellow-500 mb-2" />
-                                                          <p className="font-semibold">
-                                                              恭喜！您已完成所有打卡！
-                                                          </p>
-                                                      </div>
-                                                  )}
-                                        </div>
-                                    )}
-                                </div>
-
-                                {/* 打卡記錄 */}
-                                <div className="mt-6">
-                                    <h2 className="text-xl font-semibold mb-2">打卡記錄</h2>
-                                    {isCheckinsLoading ? (
-                                        <p>載入中...</p>
-                                    ) : checkinsError ? (
-                                        <p className="text-red-500">{checkinsError}</p>
-                                    ) : checkins.length > 0 ? (
-                                        <ul className="space-y-2">
-                                            {checkins.map((checkin: any) => (
-                                                <li
-                                                    key={checkin.id}
-                                                    className="bg-white p-2 rounded shadow"
-                                                >
-                                                    {checkin.barName} -{' '}
-                                                    {new Date(
-                                                        checkin.checkin_time
-                                                    ).toLocaleString()}
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    ) : (
-                                        <p>目前沒有打卡記錄。</p>
-                                    )}
-                                </div>
+                            <div className="animate-pulse space-y-4">
+                                <div className="h-4 bg-[#009f92] rounded w-3/4 opacity-50" />
+                                <div className="h-4 bg-[#009f92] rounded w-1/2 opacity-50" />
                             </div>
-                        ) : (
-                            <p>沒有找到活動資訊。</p>
-                        )}
+                        ) : error ? (
+                            <div className="text-[#fe9e84] text-center p-4">
+                                <ExclamationTriangle className="w-12 h-12 mx-auto mb-2" />
+                                <p>{error}</p>
+                            </div>
+                        ) : activity ? (
+                            <>
+                                {/* 集點進度卡片 */}
+                                <div className="bg-white rounded-xl p-6">
+                                    <h2 className="text-xl font-rubik text-[#00777b] mb-4 text-center">
+                                        集點進度
+                                    </h2>
+                                    <div className="grid grid-cols-5 gap-3 mb-4">
+                                        {[
+                                            ...Array(
+                                                activity.check_in_limit * activity.locations.length
+                                            )
+                                        ].map((_, i) => (
+                                            <div
+                                                key={i}
+                                                className={`aspect-square rounded-full flex items-center justify-center ${
+                                                    i < (checkins?.length || 0)
+                                                        ? 'bg-[#009f92]'
+                                                        : 'border-2 border-[#009f92] border-dashed'
+                                                }`}
+                                            >
+                                                <Star
+                                                    className={`w-6 h-6 ${
+                                                        i < (checkins?.length || 0)
+                                                            ? 'text-white'
+                                                            : 'text-[#009f92] opacity-30'
+                                                    }`}
+                                                />
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <p className="text-center text-[#00777b] font-medium">
+                                        已收集 {checkins?.length || 0} /{' '}
+                                        {activity.check_in_limit * activity.locations.length} 個印章
+                                    </p>
+
+                                    {/* 新增打卡記錄 Modal */}
+                                    <CheckinHistoryModal checkins={checkins || []} />
+                                </div>
+
+                                {/* 活動資訊卡片 */}
+                                <div className="bg-white rounded-xl p-6">
+                                    <h2 className="text-xl font-rubik text-[#00777b] mb-4">
+                                        活動資訊
+                                    </h2>
+                                    <div className="space-y-3 text-[#00777b]">
+                                        <p className="flex items-center gap-2">
+                                            <Calendar className="w-5 h-5 text-[#009f92]" />
+                                            {new Date(activity.start_date).toLocaleDateString()} -
+                                            {new Date(activity.end_date).toLocaleDateString()}
+                                        </p>
+                                        <p className="flex items-center gap-2">
+                                            <MapPin className="w-5 h-5 text-[#009f92]" />
+                                            {activity.single_location_only
+                                                ? '單一地點'
+                                                : '多地點'}{' '}
+                                            活動
+                                        </p>
+                                    </div>
+                                    <div className="mt-4">
+                                        <ActivityInfoModal activity={activity} />
+                                    </div>
+                                </div>
+
+                                {/* 打卡地點列表 */}
+                                {activity.locations.map((location) => (
+                                    <div
+                                        key={location.id}
+                                        className="bg-white rounded-xl p-4 flex justify-between items-center"
+                                    >
+                                        <div>
+                                            <h3 className="font-rubik text-[#00777b]">
+                                                {location.name}
+                                            </h3>
+                                            <p className="text-sm text-[#009f92]">
+                                                {location.address}
+                                            </p>
+                                        </div>
+                                        <Button
+                                            className="bg-[#009f92] hover:bg-[#009f92]/90 text-white"
+                                            size="sm"
+                                        >
+                                            可打卡
+                                        </Button>
+                                    </div>
+                                ))}
+                            </>
+                        ) : null}
                     </CardContent>
-                    <CardFooter>
-                        <Button onClick={handleGoBack} className="w-full">
-                            返回
-                        </Button>
-                    </CardFooter>
                 </Card>
             </main>
         </div>

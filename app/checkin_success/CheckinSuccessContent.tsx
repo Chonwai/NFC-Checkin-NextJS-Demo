@@ -12,6 +12,8 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useActivity } from '@/hooks/useActivity';
+import { Check, MapPin, Calendar } from 'lucide-react';
+import { ActivityInfoModal } from '@/components/ActivityInfoModal';
 
 export default function CheckinSuccessContent() {
     const router = useRouter();
@@ -32,36 +34,61 @@ export default function CheckinSuccessContent() {
     }, [activity, locationId]);
 
     return (
-        <Card className="w-full max-w-md mx-auto">
-            <CardHeader>
-                <CardTitle>打卡成功！</CardTitle>
-                <CardDescription>感謝您的參與。</CardDescription>
-            </CardHeader>
-            <CardContent>
-                <div className="text-center">
-                    <p className="text-2xl mb-2">✅</p>
-                    <p className="text-xl font-semibold mb-4">您的打卡已成功記錄。</p>
-                    {isLoading ? (
-                        <p>載入活動資訊中...</p>
-                    ) : activity ? (
-                        <div className="text-left bg-gray-50 p-4 rounded-lg">
-                            <h3 className="font-semibold text-lg mb-2">{activity.name}</h3>
-                            <p className="text-gray-600 mb-2">
-                                打卡地點：{locationName || '未知地點'}
-                            </p>
-                            <p className="text-gray-600">打卡時間：{new Date().toLocaleString()}</p>
-                        </div>
-                    ) : null}
-                </div>
-            </CardContent>
-            <CardFooter className="flex flex-col gap-2">
-                <Button className="w-full" onClick={() => router.push('/my-checkins')}>
-                    查看我的打卡記錄
-                </Button>
-                <Button className="w-full" variant="outline" onClick={() => router.push('/')}>
-                    返回首頁
-                </Button>
-            </CardFooter>
-        </Card>
+        <div className="min-h-screen bg-[#00777b] py-8">
+            <Card className="w-full max-w-md mx-auto bg-[#f7e7be] border-none">
+                <CardHeader className="text-center">
+                    <div className="mx-auto w-16 h-16 bg-[#009f92] rounded-full flex items-center justify-center mb-4">
+                        <Check className="w-8 h-8 text-white" />
+                    </div>
+                    <CardTitle className="text-2xl font-rubik text-[#00777b]">打卡成功！</CardTitle>
+                    <CardDescription className="text-[#009f92]">
+                        太棒了！您離獎勵更近一步
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <div className="space-y-6">
+                        {isLoading ? (
+                            <div className="animate-pulse space-y-4">
+                                <div className="h-4 bg-[#009f92] rounded w-3/4 opacity-50" />
+                                <div className="h-4 bg-[#009f92] rounded w-1/2 opacity-50" />
+                            </div>
+                        ) : activity ? (
+                            <>
+                                <div className="bg-white rounded-xl p-4">
+                                    <h3 className="font-rubik text-[#00777b] mb-2">
+                                        {activity.name}
+                                    </h3>
+                                    <div className="space-y-2 text-[#009f92]">
+                                        <p className="flex items-center gap-2">
+                                            <MapPin className="w-4 h-4" />
+                                            {locationName || '未知地點'}
+                                        </p>
+                                        <p className="flex items-center gap-2">
+                                            <Calendar className="w-4 h-4" />
+                                            {new Date().toLocaleString()}
+                                        </p>
+                                    </div>
+                                </div>
+                                <ActivityInfoModal activity={activity} />
+                            </>
+                        ) : null}
+                    </div>
+                </CardContent>
+                <CardFooter className="flex flex-col gap-3">
+                    <Button
+                        className="w-full bg-[#009f92] hover:bg-[#009f92]/90 text-white"
+                        onClick={() => router.push('/my-checkins')}
+                    >
+                        查看我的集點進度
+                    </Button>
+                    <Button
+                        className="w-full bg-[#fe9e84] hover:bg-[#fe9e84]/90 text-white"
+                        onClick={() => router.push('/')}
+                    >
+                        返回首頁
+                    </Button>
+                </CardFooter>
+            </Card>
+        </div>
     );
 }
