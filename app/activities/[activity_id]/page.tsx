@@ -119,7 +119,23 @@ export default function ActivityDetails({ params }: ActivityDetailsProps) {
                                         {activity.check_in_limit * activity.locations.length} 個印章
                                     </p>
 
-                                    {/* 新增打卡記錄 Modal */}
+                                    {/* 新增完成打卡提示 */}
+                                    {checkins?.length ===
+                                        activity.check_in_limit * activity.locations.length && (
+                                        <div className="mt-4 text-center">
+                                            <div className="bg-[#009f92]/10 rounded-lg p-4">
+                                                <Gift className="w-8 h-8 text-[#009f92] mx-auto mb-2" />
+                                                <p className="text-[#00777b] font-medium">
+                                                    恭喜完成所有集點！
+                                                </p>
+                                                <p className="text-[#009f92] text-sm mt-1">
+                                                    您已完成本活動的所有打卡任務
+                                                </p>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* 打卡記錄 Modal */}
                                     <CheckinHistoryModal checkins={checkins || []} />
                                 </div>
 
