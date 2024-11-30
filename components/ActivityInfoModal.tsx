@@ -8,7 +8,12 @@ import {
 import { Info, Calendar, MapPin, Gift } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-export function ActivityInfoModal({ activity }: { activity: any }) {
+interface ActivityInfoModalProps {
+    activity: any;
+    children?: React.ReactNode;
+}
+
+export function ActivityInfoModal({ activity, children }: ActivityInfoModalProps) {
     return (
         <Dialog>
             <DialogTrigger asChild>

@@ -7,7 +7,7 @@ import CheckinVerifyContent from './CheckinVerifyContent';
 
 export default function CheckinVerify() {
     return (
-        <div className="min-h-screen bg-gray-100">
+        <div className="min-h-screen bg-[#00777b]">
             <Header />
             <main className="container mx-auto px-4 py-8">
                 <Suspense fallback={<LoadingCard />}>

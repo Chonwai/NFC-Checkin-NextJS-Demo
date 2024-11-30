@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useCheckinToken } from '@/hooks/useCheckinToken';
 import { getDeviceId } from '@/lib/fingerprint';
+import { Loader2 } from 'lucide-react';
 
 export default function CheckinVerifyContent() {
     const router = useRouter();
@@ -48,15 +49,26 @@ export default function CheckinVerifyContent() {
     }, [error, router]);
 
     return (
-        <Card className="w-full max-w-md mx-auto">
-            <CardHeader>
-                <CardTitle>打卡中...</CardTitle>
-                <CardDescription>請稍候，正在完成您的打卡操作。</CardDescription>
+        <Card className="w-full max-w-md mx-auto bg-[#f7e7be] border-none">
+            <CardHeader className="text-center">
+                <div className="mx-auto w-16 h-16 bg-[#009f92]/20 rounded-full flex items-center justify-center mb-4">
+                    <Loader2 className="w-8 h-8 text-[#009f92] animate-spin" />
+                </div>
+                <CardTitle className="text-2xl font-rubik text-[#00777b]">打卡處理中</CardTitle>
+                <CardDescription className="text-[#009f92]">
+                    請稍候，正在為您完成打卡
+                </CardDescription>
             </CardHeader>
             <CardContent>
-                <div className="text-center">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
-                    <p>目前正在處理您的打卡請求，請勿關閉此頁面。</p>
+                <div className="text-center space-y-4">
+                    <div className="bg-white rounded-xl p-6">
+                        <div className="flex items-center justify-center space-x-2">
+                            <div className="w-2 h-2 bg-[#009f92] rounded-full animate-bounce [animation-delay:-0.3s]" />
+                            <div className="w-2 h-2 bg-[#009f92] rounded-full animate-bounce [animation-delay:-0.15s]" />
+                            <div className="w-2 h-2 bg-[#009f92] rounded-full animate-bounce" />
+                        </div>
+                        <p className="mt-4 text-[#00777b]">正在處理您的打卡請求，請勿關閉此頁面</p>
+                    </div>
                 </div>
             </CardContent>
         </Card>

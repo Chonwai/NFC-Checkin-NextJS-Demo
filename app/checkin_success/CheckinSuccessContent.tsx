@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useActivity } from '@/hooks/useActivity';
-import { Check, MapPin, Calendar } from 'lucide-react';
+import { Check, MapPin, Calendar, Info } from 'lucide-react';
 import { ActivityInfoModal } from '@/components/ActivityInfoModal';
 
 export default function CheckinSuccessContent() {
@@ -69,7 +69,22 @@ export default function CheckinSuccessContent() {
                                         </p>
                                     </div>
                                 </div>
-                                <ActivityInfoModal activity={activity} />
+                                <div className="bg-white rounded-xl p-4">
+                                    <div className="text-center">
+                                        <h3 className="font-rubik text-[#00777b] mb-2">
+                                            查看活動詳情
+                                        </h3>
+                                        <p className="text-sm text-[#009f92] mb-3">
+                                            了解更多活動規則和獎勵內容
+                                        </p>
+                                        <ActivityInfoModal activity={activity}>
+                                            <Button className="w-full bg-[#009f92] hover:bg-[#009f92]/90 text-white font-medium">
+                                                <Info className="w-4 h-4 mr-2" />
+                                                活動詳情
+                                            </Button>
+                                        </ActivityInfoModal>
+                                    </div>
+                                </div>
                             </>
                         ) : null}
                     </div>
