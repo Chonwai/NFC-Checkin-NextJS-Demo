@@ -1,4 +1,4 @@
-import { ArrowLeft, Home, Trophy, History, MapPin } from 'lucide-react';
+import { ArrowLeft, Home } from 'lucide-react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
