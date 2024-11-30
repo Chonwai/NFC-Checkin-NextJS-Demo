@@ -15,7 +15,7 @@ import { useAllCheckins } from '@/hooks/useAllCheckins';
 import { getDeviceId } from '@/lib/fingerprint';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ExclamationTriangle, MapPin, Calendar, Star, Gift } from 'lucide-react';
+import { AlertTriangle, MapPin, Calendar, Star, Gift } from 'lucide-react';
 
 export default function MyCheckins() {
     const router = useRouter();
@@ -55,7 +55,7 @@ export default function MyCheckins() {
                             </div>
                         ) : error ? (
                             <div className="text-[#fe9e84] text-center p-4">
-                                <ExclamationTriangle className="w-12 h-12 mx-auto mb-2" />
+                                <AlertTriangle className="w-12 h-12 mx-auto mb-2" />
                                 <p>{error}</p>
                             </div>
                         ) : checkins.length > 0 ? (
