@@ -25,6 +25,7 @@ import { useState, useEffect } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { ActivityInfoModal } from '@/components/ActivityInfoModal';
 import { CheckinHistoryModal } from '@/components/CheckinHistoryModal';
+import { RewardModal } from '@/components/RewardModal';
 
 interface ActivityDetailsProps {
     params: Promise<{ activity_id: string }>;
@@ -41,6 +42,7 @@ export default function ActivityDetails({ params }: ActivityDetailsProps) {
     const router = useRouter();
 
     const [deviceId, setDeviceId] = useState<string | null>(null);
+    const [tempUserId, setTempUserId] = useState<string | null>(null);
     const {
         checkins,
         isLoading: isCheckinsLoading,
@@ -131,6 +133,17 @@ export default function ActivityDetails({ params }: ActivityDetailsProps) {
                                                 <p className="text-[#009f92] text-sm mt-1">
                                                     您已完成本活動的所有打卡任務
                                                 </p>
+                                                {activity.meta?.reward_api && (
+                                                    <div className="mt-4">
+                                                        <RewardModal
+                                                            activity={activity}
+                                                            tempUserId={
+                                                                checkins?.[checkins.length - 1]
+                                                                    ?.temp_user_id
+                                                            }
+                                                        />
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
                                     )}
