@@ -6,9 +6,10 @@ import {
     DialogTrigger
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Gift } from 'lucide-react';
+import { Gift, Check, XCircle } from 'lucide-react';
 import Image from 'next/image';
 import { useReward } from '@/hooks/useReward';
+import QRCode from 'react-qr-code';
 
 interface RewardModalProps {
     activity: any;
@@ -23,6 +24,32 @@ export function RewardModal({ activity, tempUserId }: RewardModalProps) {
         await fetchRewardInfo(activity.meta.reward_api.query_endpoint, tempUserId);
     };
 
+    const getStatusText = (status: string) => {
+        switch (status) {
+            case 'PENDING':
+                return '未使用';
+            case 'USED':
+                return '已使用';
+            case 'CANCELLED':
+                return '已失效';
+            default:
+                return '未知狀態';
+        }
+    };
+
+    const getStatusColor = (status: string) => {
+        switch (status) {
+            case 'PENDING':
+                return 'text-[#009f92]';
+            case 'USED':
+                return 'text-gray-500';
+            case 'CANCELLED':
+                return 'text-[#fe9e84]';
+            default:
+                return 'text-gray-500';
+        }
+    };
+
     return (
         <Dialog>
             <DialogTrigger asChild>
@@ -31,7 +58,7 @@ export function RewardModal({ activity, tempUserId }: RewardModalProps) {
                     onClick={handleFetchReward}
                 >
                     <Gift className="w-4 h-4 mr-2" />
-                    查看我的獎勵
+                    查看和兌換我的獎勵
                 </Button>
             </DialogTrigger>
             <DialogContent className="bg-[#f7e7be] border-none max-w-lg">
@@ -69,19 +96,51 @@ export function RewardModal({ activity, tempUserId }: RewardModalProps) {
                                             </p>
                                         )}
                                         <div className="bg-[#f7e7be]/50 p-3 rounded-lg">
-                                            <p className="text-[#00777b] font-medium">
-                                                兌換碼：{reward.code}
-                                            </p>
-                                            <p className="text-[#009f92] text-sm mt-1">
-                                                有效期限：
-                                                {new Date(
-                                                    reward.coupon.endedDate
-                                                ).toLocaleDateString()}
-                                            </p>
-                                            <p className="text-[#009f92] text-sm">
-                                                狀態：
-                                                {reward.status === 'PENDING' ? '未使用' : '已使用'}
-                                            </p>
+                                            <div className="flex items-center justify-between">
+                                                <div className="space-y-2">
+                                                    <p className="text-[#00777b] font-medium">
+                                                        兌換碼：{reward.code}
+                                                    </p>
+                                                    <p className="text-[#009f92] text-sm">
+                                                        有效期限：
+                                                        {new Date(
+                                                            reward.coupon.endedDate
+                                                        ).toLocaleDateString()}
+                                                    </p>
+                                                    <p
+                                                        className={`text-sm ${getStatusColor(reward.status)}`}
+                                                    >
+                                                        狀態：{getStatusText(reward.status)}
+                                                    </p>
+                                                </div>
+                                                <div className="bg-white p-2 rounded-lg relative">
+                                                    <QRCode
+                                                        value={reward.code}
+                                                        size={100}
+                                                        level="H"
+                                                        className={`h-24 w-24 ${reward.status !== 'PENDING' ? 'opacity-10' : ''}`}
+                                                    />
+                                                    {reward.status !== 'PENDING' && (
+                                                        <div className="absolute inset-0 flex items-center justify-center bg-black/10 rounded-lg">
+                                                            {reward.status === 'USED' ? (
+                                                                <div className="text-center">
+                                                                    <Check className="w-8 h-8 text-gray-600 mx-auto mb-1" />
+                                                                    <p className="text-xs font-bold text-gray-600">
+                                                                        已使用
+                                                                    </p>
+                                                                </div>
+                                                            ) : (
+                                                                <div className="text-center">
+                                                                    <XCircle className="w-8 h-8 text-[#fe9e84] mx-auto mb-1" />
+                                                                    <p className="text-xs font-bold text-[#fe9e84]">
+                                                                        已失效
+                                                                    </p>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
