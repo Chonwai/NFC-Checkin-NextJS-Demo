@@ -10,6 +10,7 @@ import { Gift, Check, XCircle } from 'lucide-react';
 import Image from 'next/image';
 import { useReward } from '@/hooks/useReward';
 import QRCode from 'react-qr-code';
+import { useState } from 'react';
 
 interface RewardModalProps {
     activity: any;
@@ -18,10 +19,13 @@ interface RewardModalProps {
 
 export function RewardModal({ activity, tempUserId }: RewardModalProps) {
     const { rewardInfo, isLoading, error, fetchRewardInfo } = useReward();
+    const [isOpen, setIsOpen] = useState(false);
 
-    const handleFetchReward = async () => {
-        if (!activity.meta?.reward_api?.query_endpoint || !tempUserId) return;
-        await fetchRewardInfo(activity.meta.reward_api.query_endpoint, tempUserId);
+    const handleOpenChange = (open: boolean) => {
+        setIsOpen(open);
+        if (open && activity.meta?.reward_api?.query_endpoint && tempUserId) {
+            fetchRewardInfo(activity.meta.reward_api.query_endpoint, tempUserId, true);
+        }
     };
 
     const getStatusText = (status: string) => {
@@ -51,12 +55,9 @@ export function RewardModal({ activity, tempUserId }: RewardModalProps) {
     };
 
     return (
-        <Dialog>
+        <Dialog open={isOpen} onOpenChange={handleOpenChange}>
             <DialogTrigger asChild>
-                <Button
-                    className="w-full bg-[#009f92] hover:bg-[#009f92]/90 text-white"
-                    onClick={handleFetchReward}
-                >
+                <Button className="w-full bg-[#009f92] hover:bg-[#009f92]/90 text-white">
                     <Gift className="w-4 h-4 mr-2" />
                     查看和兌換我的獎勵
                 </Button>
