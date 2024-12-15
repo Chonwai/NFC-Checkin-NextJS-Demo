@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Clock, Users, MapPin, TrendingUp } from 'lucide-react';
 import { formatUUID } from '@/utils/format';
+import { formatDateTime } from '@/utils/dateTime';
 
 export default function CheckInsAnalytics() {
     const { timeDistribution, userBehavior, locationHeatMap, completionTrend, isLoading, error } =
@@ -114,7 +115,7 @@ export default function CheckInsAnalytics() {
                                                     最後打卡
                                                 </p>
                                                 <p className="text-sm">
-                                                    {new Date(user.last_check_in).toLocaleString()}
+                                                    {formatDateTime(user.last_check_in)}
                                                 </p>
                                             </div>
                                             <div>
