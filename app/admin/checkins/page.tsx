@@ -5,7 +5,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Clock, Users, MapPin, TrendingUp } from 'lucide-react';
 import { formatUUID } from '@/utils/format';
-import { formatDateTime } from '@/utils/dateTime';
+import {
+    formatDateTime,
+    convertUTCHourToHKT,
+    formatHourDisplay,
+    formatHourWithTimezone
+} from '@/utils/dateTime';
 
 export default function CheckInsAnalytics() {
     const { timeDistribution, userBehavior, locationHeatMap, completionTrend, isLoading, error } =
@@ -39,17 +44,21 @@ export default function CheckInsAnalytics() {
                                 <div>
                                     <h3 className="font-medium mb-2">每小時分布</h3>
                                     <div className="space-y-2">
-                                        {Object.entries(
-                                            timeDistribution?.hourly_distribution || {}
-                                        ).map(([hour, count]) => (
-                                            <div
-                                                key={hour}
-                                                className="flex items-center justify-between"
-                                            >
-                                                <span>{hour}:00</span>
-                                                <span>{count} 次</span>
-                                            </div>
-                                        ))}
+                                        {Object.entries(timeDistribution?.hourly_distribution || {})
+                                            .map(([hour, count]) => ({
+                                                hour: convertUTCHourToHKT(parseInt(hour)),
+                                                count
+                                            }))
+                                            .sort((a, b) => a.hour - b.hour)
+                                            .map(({ hour, count }) => (
+                                                <div
+                                                    key={hour}
+                                                    className="flex items-center justify-between"
+                                                >
+                                                    <span>{formatHourDisplay(hour)}</span>
+                                                    <span>{count} 次</span>
+                                                </div>
+                                            ))}
                                     </div>
                                 </div>
                                 <div>
@@ -171,12 +180,14 @@ export default function CheckInsAnalytics() {
                                                     </div>
                                                     <div>
                                                         <p className="text-sm text-muted-foreground">
-                                                            平均打卡時間
+                                                            平均最多打卡時間
                                                         </p>
                                                         <p className="font-semibold">
-                                                            {Math.round(
-                                                                parseFloat(
-                                                                    location.avg_check_in_hour
+                                                            {convertUTCHourToHKT(
+                                                                Math.round(
+                                                                    parseFloat(
+                                                                        location.avg_check_in_hour
+                                                                    )
                                                                 )
                                                             )}
                                                             :00

@@ -60,3 +60,21 @@ export const formatInputToUTC = (inputDate: string) => {
     // 假設輸入是香港時間，轉換為 UTC
     return dayjs.tz(inputDate, DEFAULT_TIMEZONE).utc().format();
 };
+
+// 將 UTC 小時轉換為香港時區小時
+export const convertUTCHourToHKT = (utcHour: number) => {
+    // 香港是 UTC+8
+    const hktHour: number = (utcHour + 8) % 24;
+    return hktHour;
+};
+
+// 格式化小時顯示
+export const formatHourDisplay = (hour: number) => {
+    return `${hour.toString().padStart(2, '0')}:00`;
+};
+
+// 格式化小時顯示，補零並添加時區標記
+export const formatHourWithTimezone = (hour: number) => {
+    const hktHour = (hour + 8) % 24;
+    return `${hktHour.toString().padStart(2, '0')}:00 (HKT)`;
+};
