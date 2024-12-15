@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Plus, Calendar, MapPin, CheckSquare, Pencil } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
-import { formatDate } from '@/utils/dateTime';
+import { formatDateTime } from '@/utils/dateTime';
 
 export default function AdminActivities() {
     const { activities, isLoading, error } = useAdminActivities();
@@ -74,8 +74,8 @@ export default function AdminActivities() {
                                     <div className="flex items-center gap-2">
                                         <Calendar className="h-4 w-4 text-muted-foreground" />
                                         <span className="text-sm">
-                                            {formatDate(activity.start_date)} -{' '}
-                                            {formatDate(activity.end_date)}
+                                            {formatDateTime(activity.start_date)} -{' '}
+                                            {formatDateTime(activity.end_date)}
                                         </span>
                                     </div>
                                     <div className="flex items-center gap-2">

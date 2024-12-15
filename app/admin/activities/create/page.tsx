@@ -10,7 +10,13 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import dayjs from 'dayjs';
-import { formatUTCToZonedInput, formatDateTimeForInput, formatInputToUTC } from '@/utils/dateTime';
+import {
+    formatUTCToZonedInput,
+    formatDateTimeForInput,
+    formatInputToUTC,
+    formatDateTime
+} from '@/utils/dateTime';
+
 export default function CreateActivity() {
     const { createActivity, isLoading } = useCreateActivity();
     const router = useRouter();

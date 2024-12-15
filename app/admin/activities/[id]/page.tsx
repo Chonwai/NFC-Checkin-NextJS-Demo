@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Calendar, MapPin, CheckSquare, Pencil } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { formatDateTime } from '@/utils/dateTime';
 
 export default function ActivityDetails({ params }: { params: Promise<{ id: string }> }) {
     const [activityId, setActivityId] = useState<string | null>(null);
@@ -53,8 +54,8 @@ export default function ActivityDetails({ params }: { params: Promise<{ id: stri
                         <div className="flex items-center gap-2">
                             <Calendar className="h-4 w-4 text-muted-foreground" />
                             <span className="text-sm">
-                                {new Date(activity.start_date).toLocaleDateString()} -
-                                {new Date(activity.end_date).toLocaleDateString()}
+                                {formatDateTime(activity.start_date)} -{' '}
+                                {formatDateTime(activity.end_date)}
                             </span>
                         </div>
                         <div className="flex items-center gap-2">
