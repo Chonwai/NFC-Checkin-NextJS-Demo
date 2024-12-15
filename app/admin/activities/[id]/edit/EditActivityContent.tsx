@@ -10,6 +10,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
+import {
+    formatLocalToUTC,
+    formatDateTimeForInput,
+    formatUTCToZonedInput,
+    formatInputToUTC
+} from '@/utils/dateTime';
 
 export default function EditActivityContent({ activityId }: { activityId: string }) {
     const router = useRouter();
@@ -31,8 +37,8 @@ export default function EditActivityContent({ activityId }: { activityId: string
             setFormData({
                 name: activity.name,
                 description: activity.description,
-                start_date: new Date(activity.start_date).toISOString().slice(0, 16),
-                end_date: new Date(activity.end_date).toISOString().slice(0, 16),
+                start_date: formatUTCToZonedInput(activity.start_date),
+                end_date: formatUTCToZonedInput(activity.end_date),
                 check_in_limit: activity.check_in_limit,
                 single_location_only: activity.single_location_only,
                 is_active: activity.is_active
@@ -43,12 +49,14 @@ export default function EditActivityContent({ activityId }: { activityId: string
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
+            const payload = {
+                ...formData,
+                start_date: formatInputToUTC(formData.start_date),
+                end_date: formatInputToUTC(formData.end_date)
+            };
+
             const response = await updateActivity(activityId, {
-                activity: {
-                    ...formData,
-                    start_date: new Date(formData.start_date).toISOString(),
-                    end_date: new Date(formData.end_date).toISOString()
-                }
+                activity: payload
             });
 
             if (response.success) {
@@ -110,7 +118,7 @@ export default function EditActivityContent({ activityId }: { activityId: string
                                 <label className="text-sm font-medium">開始時間</label>
                                 <Input
                                     type="datetime-local"
-                                    value={formData.start_date}
+                                    value={formatDateTimeForInput(formData.start_date)}
                                     onChange={(e) =>
                                         setFormData({ ...formData, start_date: e.target.value })
                                     }
@@ -122,7 +130,7 @@ export default function EditActivityContent({ activityId }: { activityId: string
                                 <label className="text-sm font-medium">結束時間</label>
                                 <Input
                                     type="datetime-local"
-                                    value={formData.end_date}
+                                    value={formatDateTimeForInput(formData.end_date)}
                                     onChange={(e) =>
                                         setFormData({ ...formData, end_date: e.target.value })
                                     }

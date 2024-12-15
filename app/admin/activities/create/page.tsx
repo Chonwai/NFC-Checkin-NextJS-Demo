@@ -9,7 +9,8 @@ import { Switch } from '@/components/ui/switch';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
-
+import dayjs from 'dayjs';
+import { formatUTCToZonedInput, formatDateTimeForInput, formatInputToUTC } from '@/utils/dateTime';
 export default function CreateActivity() {
     const { createActivity, isLoading } = useCreateActivity();
     const router = useRouter();
@@ -17,8 +18,8 @@ export default function CreateActivity() {
     const [formData, setFormData] = useState({
         name: '',
         description: '',
-        start_date: '',
-        end_date: '',
+        start_date: formatUTCToZonedInput(dayjs().format()),
+        end_date: formatUTCToZonedInput(dayjs().add(7, 'day').format()),
         check_in_limit: 1,
         single_location_only: true,
         is_active: true
@@ -26,28 +27,29 @@ export default function CreateActivity() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        const response = await createActivity({
-            activity: {
+        try {
+            const payload = {
                 ...formData,
-                start_date: new Date(formData.start_date).toISOString(),
-                end_date: new Date(formData.end_date).toISOString()
-            }
-        });
+                start_date: formatInputToUTC(formData.start_date),
+                end_date: formatInputToUTC(formData.end_date)
+            };
 
-        if (response.success && response.data) {
-            toast({
-                title: '建立成功',
-                description: `活動「${response.data.activity.name}」已成功建立`,
-                duration: 3000
+            const response = await createActivity({
+                activity: payload
             });
-            router.push('/admin/activities');
-        } else {
-            const errorMessage =
-                response.error?.details?.[0] || response.error?.message || '未知錯誤';
 
+            if (response.success) {
+                toast({
+                    title: '建立成功',
+                    description: `活動「${formData.name}」已成功建立`,
+                    duration: 3000
+                });
+                router.push('/admin/activities');
+            }
+        } catch (err: any) {
             toast({
                 title: '建立失敗',
-                description: errorMessage,
+                description: err.message || '未知錯誤',
                 variant: 'destructive',
                 duration: 3000
             });
@@ -88,25 +90,25 @@ export default function CreateActivity() {
 
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <label className="text-sm font-medium">開始日期</label>
+                                <label className="text-sm font-medium">開始時間</label>
                                 <Input
                                     type="datetime-local"
-                                    required
-                                    value={formData.start_date}
+                                    value={formatDateTimeForInput(formData.start_date)}
                                     onChange={(e) =>
                                         setFormData({ ...formData, start_date: e.target.value })
                                     }
+                                    required
                                 />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-sm font-medium">結束日期</label>
+                                <label className="text-sm font-medium">結束時間</label>
                                 <Input
                                     type="datetime-local"
-                                    required
-                                    value={formData.end_date}
+                                    value={formatDateTimeForInput(formData.end_date)}
                                     onChange={(e) =>
                                         setFormData({ ...formData, end_date: e.target.value })
                                     }
+                                    required
                                 />
                             </div>
                         </div>

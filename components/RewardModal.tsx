@@ -11,6 +11,7 @@ import Image from 'next/image';
 import { useReward } from '@/hooks/useReward';
 import QRCode from 'react-qr-code';
 import { useState } from 'react';
+import { formatDate } from '@/utils/dateTime';
 
 interface RewardModalProps {
     activity: any;
@@ -104,9 +105,7 @@ export function RewardModal({ activity, tempUserId }: RewardModalProps) {
                                                     </p>
                                                     <p className="text-[#009f92] text-sm">
                                                         有效期限：
-                                                        {new Date(
-                                                            reward.coupon.endedDate
-                                                        ).toLocaleDateString()}
+                                                        {formatDate(reward.coupon.endedDate)}
                                                     </p>
                                                     <p
                                                         className={`text-sm ${getStatusColor(reward.status)}`}
