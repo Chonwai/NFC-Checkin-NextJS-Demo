@@ -222,7 +222,7 @@ export interface LocationHeatMapItem {
     name: string;
     check_in_count: number;
     unique_users: number;
-    avg_check_in_hour: string;
+    median_check_in_hour: number;
     id: string | null;
 }
 

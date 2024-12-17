@@ -180,15 +180,11 @@ export default function CheckInsAnalytics() {
                                                     </div>
                                                     <div>
                                                         <p className="text-sm text-muted-foreground">
-                                                            平均最多打卡時間
+                                                            打卡時間中位數
                                                         </p>
                                                         <p className="font-semibold">
                                                             {convertUTCHourToHKT(
-                                                                Math.round(
-                                                                    parseFloat(
-                                                                        location.avg_check_in_hour
-                                                                    )
-                                                                )
+                                                                location.median_check_in_hour
                                                             )}
                                                             :00
                                                         </p>
