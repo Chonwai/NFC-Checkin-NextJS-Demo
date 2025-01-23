@@ -17,19 +17,31 @@ import {
     formatInputToUTC
 } from '@/utils/dateTime';
 
+interface EditActivityFormData {
+    name: string;
+    description: string;
+    start_date: string;
+    end_date: string;
+    check_in_limit: number;
+    single_location_only: boolean;
+    is_active: boolean;
+    requires_contact_info: boolean;
+}
+
 export default function EditActivityContent({ activityId }: { activityId: string }) {
     const router = useRouter();
     const { toast } = useToast();
     const { activity, isLoading: isLoadingActivity } = useActivity(activityId);
     const { updateActivity, isLoading: isUpdating } = useUpdateActivity();
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState<EditActivityFormData>({
         name: '',
         description: '',
         start_date: '',
         end_date: '',
         check_in_limit: 1,
         single_location_only: true,
-        is_active: true
+        is_active: true,
+        requires_contact_info: false
     });
 
     useEffect(() => {
@@ -41,7 +53,8 @@ export default function EditActivityContent({ activityId }: { activityId: string
                 end_date: formatUTCToZonedInput(activity.end_date),
                 check_in_limit: activity.check_in_limit,
                 single_location_only: activity.single_location_only,
-                is_active: activity.is_active
+                is_active: activity.is_active,
+                requires_contact_info: activity.requires_contact_info
             });
         }
     }, [activity]);
@@ -155,24 +168,34 @@ export default function EditActivityContent({ activityId }: { activityId: string
                             />
                         </div>
 
-                        <div className="flex items-center space-x-2">
+                        <div className="flex items-center justify-between">
+                            <label className="text-sm font-medium">僅限單一地點打卡</label>
                             <Switch
                                 checked={formData.single_location_only}
                                 onCheckedChange={(checked) =>
                                     setFormData({ ...formData, single_location_only: checked })
                                 }
                             />
-                            <label className="text-sm font-medium">僅限單一地點打卡</label>
                         </div>
 
-                        <div className="flex items-center space-x-2">
+                        <div className="flex items-center justify-between">
+                            <label className="text-sm font-medium">活動開啟</label>
                             <Switch
                                 checked={formData.is_active}
                                 onCheckedChange={(checked) =>
                                     setFormData({ ...formData, is_active: checked })
                                 }
                             />
-                            <label className="text-sm font-medium">活動開啟</label>
+                        </div>
+
+                        <div className="flex items-center justify-between">
+                            <label className="text-sm font-medium">需要聯絡資訊</label>
+                            <Switch
+                                checked={formData.requires_contact_info}
+                                onCheckedChange={(checked) =>
+                                    setFormData({ ...formData, requires_contact_info: checked })
+                                }
+                            />
                         </div>
 
                         <div className="flex justify-end gap-4">

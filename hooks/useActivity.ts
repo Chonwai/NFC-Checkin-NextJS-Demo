@@ -21,6 +21,7 @@ interface Activity {
     single_location_only: boolean;
     locations: Location[];
     is_active: boolean;
+    requires_contact_info: boolean;
 }
 
 interface Location {

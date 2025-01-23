@@ -17,18 +17,30 @@ import {
     formatDateTime
 } from '@/utils/dateTime';
 
+interface CreateActivityFormData {
+    name: string;
+    description: string;
+    start_date: string;
+    end_date: string;
+    check_in_limit: number;
+    single_location_only: boolean;
+    is_active: boolean;
+    requires_contact_info: boolean;
+}
+
 export default function CreateActivity() {
     const { createActivity, isLoading } = useCreateActivity();
     const router = useRouter();
     const { toast } = useToast();
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState<CreateActivityFormData>({
         name: '',
         description: '',
         start_date: formatUTCToZonedInput(dayjs().format()),
         end_date: formatUTCToZonedInput(dayjs().add(7, 'day').format()),
         check_in_limit: 1,
         single_location_only: true,
-        is_active: true
+        is_active: true,
+        requires_contact_info: false
     });
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -151,6 +163,16 @@ export default function CreateActivity() {
                                 checked={formData.is_active}
                                 onCheckedChange={(checked) =>
                                     setFormData({ ...formData, is_active: checked })
+                                }
+                            />
+                        </div>
+
+                        <div className="flex items-center justify-between">
+                            <label className="text-sm font-medium">需要收集聯絡資訊？</label>
+                            <Switch
+                                checked={formData.requires_contact_info}
+                                onCheckedChange={(checked) =>
+                                    setFormData({ ...formData, requires_contact_info: checked })
                                 }
                             />
                         </div>
