@@ -31,8 +31,8 @@ export default function EditLocationContent({ locationId }: { locationId: string
                 name: location.name,
                 description: location.description,
                 address: location.address,
-                check_in_icon_type: location.check_in_icon_type,
-                check_in_icon_url: location.check_in_icon_url
+                check_in_icon_type: location.check_in_icon_type || 'default',
+                check_in_icon_url: location.check_in_icon_url || ''
             });
         }
     }, [location]);
