@@ -16,6 +16,8 @@ import {
     SelectTrigger,
     SelectValue
 } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
+import { MediaUploader } from '@/components/MediaUploader';
 
 export default function CreateLocation() {
     const router = useRouter();
@@ -26,7 +28,9 @@ export default function CreateLocation() {
         name: '',
         description: '',
         address: '',
-        activity_id: ''
+        activity_id: '',
+        check_in_icon_url: '',
+        check_in_icon_type: 'default' // 'default' 或 'custom'
     });
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -121,6 +125,40 @@ export default function CreateLocation() {
                                     ))}
                                 </SelectContent>
                             </Select>
+                        </div>
+
+                        <div className="space-y-4">
+                            <div className="flex items-center justify-between">
+                                <label className="text-sm font-medium">使用自定義圖標</label>
+                                <Switch
+                                    checked={formData.check_in_icon_type === 'custom'}
+                                    onCheckedChange={(checked) =>
+                                        setFormData({
+                                            ...formData,
+                                            check_in_icon_type: checked ? 'custom' : 'default',
+                                            check_in_icon_url: checked
+                                                ? formData.check_in_icon_url
+                                                : ''
+                                        })
+                                    }
+                                />
+                            </div>
+
+                            {formData.check_in_icon_type === 'custom' && (
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium">上傳圖標</label>
+                                    <MediaUploader
+                                        onChange={(imageUrl) =>
+                                            setFormData({
+                                                ...formData,
+                                                check_in_icon_url: imageUrl || ''
+                                            })
+                                        }
+                                        isDisabled={isLoading}
+                                        defaultValue={formData.check_in_icon_url}
+                                    />
+                                </div>
+                            )}
                         </div>
 
                         <div className="flex justify-end gap-4">

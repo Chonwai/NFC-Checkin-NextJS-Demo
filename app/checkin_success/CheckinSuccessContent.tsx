@@ -12,10 +12,11 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useActivity } from '@/hooks/useActivity';
-import { Check, MapPin, Calendar, Info } from 'lucide-react';
+import { Check, MapPin, Calendar, Info, Star } from 'lucide-react';
 import { ActivityInfoModal } from '@/components/ActivityInfoModal';
 import { ContactInfoModal } from '@/components/ContactInfoModal';
 import { useContactInfo } from '@/hooks/useContactInfo';
+import Image from 'next/image';
 
 export default function CheckinSuccessContent() {
     const router = useRouter();
@@ -44,12 +45,28 @@ export default function CheckinSuccessContent() {
         }
     }, [requiresContactInfo]);
 
+    const locationIcon =
+        activity?.locations.find((loc) => loc.id === locationId)?.check_in_icon_type === 'custom' &&
+        activity?.locations.find((loc) => loc.id === locationId)?.check_in_icon_url ? (
+            <Image
+                src={
+                    activity.locations.find((loc) => loc.id === locationId)?.check_in_icon_url || ''
+                }
+                alt="打卡圖標"
+                width={32}
+                height={32}
+                className="w-8 h-8"
+            />
+        ) : (
+            <Star className="w-8 h-8 text-white" />
+        );
+
     return (
         <div className="min-h-screen bg-[#00777b] py-8">
             <Card className="w-full max-w-md mx-auto bg-[#f7e7be] border-none">
                 <CardHeader className="text-center">
                     <div className="mx-auto w-16 h-16 bg-[#009f92] rounded-full flex items-center justify-center mb-4">
-                        <Check className="w-8 h-8 text-white" />
+                        {locationIcon}
                     </div>
                     <CardTitle className="text-2xl font-rubik text-[#00777b]">打卡成功！</CardTitle>
                     <CardDescription className="text-[#009f92]">

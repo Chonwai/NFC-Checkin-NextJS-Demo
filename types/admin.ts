@@ -103,6 +103,8 @@ export interface AdminLocation {
     meta: Record<string, any>;
     created_at: string;
     updated_at: string;
+    check_in_icon_type?: 'default' | 'custom';
+    check_in_icon_url?: string;
 }
 
 export interface AdminActivitiesResponse {
