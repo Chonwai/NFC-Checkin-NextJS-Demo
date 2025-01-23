@@ -26,6 +26,7 @@ import { Badge } from '@/components/ui/badge';
 import { ActivityInfoModal } from '@/components/ActivityInfoModal';
 import { CheckinHistoryModal } from '@/components/CheckinHistoryModal';
 import { RewardModal } from '@/components/RewardModal';
+import Image from 'next/image';
 
 interface ActivityDetailsProps {
     params: Promise<{ activity_id: string }>;
@@ -92,29 +93,48 @@ export default function ActivityDetails({ params }: ActivityDetailsProps) {
                                     <h2 className="text-xl font-rubik text-[#00777b] mb-4 text-center">
                                         集點進度
                                     </h2>
-                                    <div className="grid grid-cols-5 gap-3 mb-4">
-                                        {[
-                                            ...Array(
-                                                activity.check_in_limit * activity.locations.length
+                                    <div className="flex items-center justify-center gap-4 mb-4">
+                                        {activity.locations.map((location, locationIndex) =>
+                                            // 為每個地點創建相應數量的印章位置
+                                            Array.from({ length: activity.check_in_limit }).map(
+                                                (_, stampIndex) => {
+                                                    // 計算當前印章的總索引
+                                                    const totalIndex =
+                                                        locationIndex * activity.check_in_limit +
+                                                        stampIndex;
+                                                    const isCompleted =
+                                                        totalIndex < (checkins?.length || 0);
+
+                                                    return (
+                                                        <div key={`${locationIndex}-${stampIndex}`}>
+                                                            {isCompleted ? (
+                                                                location.check_in_icon_type ===
+                                                                    'custom' &&
+                                                                location.check_in_icon_url ? (
+                                                                    <Image
+                                                                        src={
+                                                                            location.check_in_icon_url
+                                                                        }
+                                                                        alt="打卡圖標"
+                                                                        width={32}
+                                                                        height={32}
+                                                                        className="w-8 h-8"
+                                                                    />
+                                                                ) : (
+                                                                    <div className="bg-[#009f92] p-1.5 rounded-full">
+                                                                        <Star className="w-5 h-5 text-white" />
+                                                                    </div>
+                                                                )
+                                                            ) : (
+                                                                <div className="w-8 h-8 rounded-full border-2 border-dashed border-[#009f92] flex items-center justify-center">
+                                                                    <Star className="w-5 h-5 text-[#009f92]" />
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    );
+                                                }
                                             )
-                                        ].map((_, i) => (
-                                            <div
-                                                key={i}
-                                                className={`aspect-square rounded-full flex items-center justify-center ${
-                                                    i < (checkins?.length || 0)
-                                                        ? 'bg-[#009f92]'
-                                                        : 'border-2 border-[#009f92] border-dashed'
-                                                }`}
-                                            >
-                                                <Star
-                                                    className={`w-6 h-6 ${
-                                                        i < (checkins?.length || 0)
-                                                            ? 'text-white'
-                                                            : 'text-[#009f92] opacity-30'
-                                                    }`}
-                                                />
-                                            </div>
-                                        ))}
+                                        )}
                                     </div>
                                     <p className="text-center text-[#00777b] font-medium">
                                         已收集 {checkins?.length || 0} /{' '}
@@ -177,27 +197,48 @@ export default function ActivityDetails({ params }: ActivityDetailsProps) {
                                 </div>
 
                                 {/* 打卡地點列表 */}
-                                {activity.locations.map((location) => (
-                                    <div
-                                        key={location.id}
-                                        className="bg-white rounded-xl p-4 flex justify-between items-center"
-                                    >
-                                        <div>
-                                            <h3 className="font-rubik text-[#00777b]">
-                                                {location.name}
-                                            </h3>
-                                            <p className="text-sm text-[#009f92]">
-                                                {location.address}
-                                            </p>
-                                        </div>
-                                        <Button
-                                            className="bg-[#009f92] hover:bg-[#009f92]/90 text-white"
-                                            size="sm"
+                                {activity.locations.map((location) => {
+                                    const locationIcon =
+                                        location.check_in_icon_type === 'custom' &&
+                                        location.check_in_icon_url ? (
+                                            <Image
+                                                src={location.check_in_icon_url}
+                                                alt="打卡圖標"
+                                                width={32}
+                                                height={32}
+                                                className="w-8 h-8"
+                                            />
+                                        ) : (
+                                            <div className="bg-[#009f92] p-1.5 rounded-full">
+                                                <Star className="w-5 h-5 text-white" />
+                                            </div>
+                                        );
+
+                                    return (
+                                        <div
+                                            key={location.id}
+                                            className="bg-white rounded-xl p-4 flex justify-between items-center"
                                         >
-                                            可打卡
-                                        </Button>
-                                    </div>
-                                ))}
+                                            <div>
+                                                <h3 className="font-rubik text-[#00777b]">
+                                                    {location.name}
+                                                </h3>
+                                                <p className="text-sm text-[#009f92]">
+                                                    {location.address}
+                                                </p>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                {locationIcon}
+                                                <Button
+                                                    className="bg-[#009f92] hover:bg-[#009f92]/90 text-white"
+                                                    size="sm"
+                                                >
+                                                    可打卡
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
                             </>
                         ) : null}
                     </CardContent>
