@@ -48,26 +48,28 @@ export default function CheckinSuccessContent() {
     const locationIcon =
         activity?.locations.find((loc) => loc.id === locationId)?.check_in_icon_type === 'custom' &&
         activity?.locations.find((loc) => loc.id === locationId)?.check_in_icon_url ? (
-            <Image
-                src={
-                    activity.locations.find((loc) => loc.id === locationId)?.check_in_icon_url || ''
-                }
-                alt="打卡圖標"
-                width={32}
-                height={32}
-                className="w-8 h-8"
-            />
+            <div className="mx-auto w-16 h-16 flex items-center justify-center">
+                <Image
+                    src={
+                        activity.locations.find((loc) => loc.id === locationId)
+                            ?.check_in_icon_url || ''
+                    }
+                    alt="打卡圖標"
+                    width={48}
+                    height={48}
+                />
+            </div>
         ) : (
-            <Star className="w-8 h-8 text-white" />
+            <div className="mx-auto w-16 h-16 bg-[#009f92] rounded-full flex items-center justify-center">
+                <Star className="w-8 h-8 text-white" />
+            </div>
         );
 
     return (
         <div className="min-h-screen bg-[#00777b] py-8">
             <Card className="w-full max-w-md mx-auto bg-[#f7e7be] border-none">
                 <CardHeader className="text-center">
-                    <div className="mx-auto w-16 h-16 bg-[#009f92] rounded-full flex items-center justify-center mb-4">
-                        {locationIcon}
-                    </div>
+                    {locationIcon}
                     <CardTitle className="text-2xl font-rubik text-[#00777b]">打卡成功！</CardTitle>
                     <CardDescription className="text-[#009f92]">
                         太棒了！您離獎勵更近一步
@@ -118,6 +120,12 @@ export default function CheckinSuccessContent() {
                     </div>
                 </CardContent>
                 <CardFooter className="flex flex-col gap-3">
+                    <Button
+                        className="w-full bg-[#009f92] hover:bg-[#009f92]/90 text-white"
+                        onClick={() => router.push(`/activities/${activityId}`)}
+                    >
+                        返回活動頁面
+                    </Button>
                     <Button
                         className="w-full bg-[#009f92] hover:bg-[#009f92]/90 text-white"
                         onClick={() => router.push('/my-checkins')}
