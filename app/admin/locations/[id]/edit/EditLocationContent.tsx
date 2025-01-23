@@ -9,6 +9,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Switch } from '@/components/ui/switch';
+import { MediaUploader } from '@/components/MediaUploader';
 
 export default function EditLocationContent({ locationId }: { locationId: string }) {
     const router = useRouter();
@@ -18,7 +20,9 @@ export default function EditLocationContent({ locationId }: { locationId: string
     const [formData, setFormData] = useState({
         name: '',
         description: '',
-        address: ''
+        address: '',
+        check_in_icon_type: 'default',
+        check_in_icon_url: ''
     });
 
     useEffect(() => {
@@ -26,7 +30,9 @@ export default function EditLocationContent({ locationId }: { locationId: string
             setFormData({
                 name: location.name,
                 description: location.description,
-                address: location.address
+                address: location.address,
+                check_in_icon_type: location.check_in_icon_type,
+                check_in_icon_url: location.check_in_icon_url
             });
         }
     }, [location]);
@@ -101,6 +107,40 @@ export default function EditLocationContent({ locationId }: { locationId: string
                                 }
                                 required
                             />
+                        </div>
+
+                        <div className="space-y-4">
+                            <div className="flex items-center justify-between">
+                                <label className="text-sm font-medium">使用自定義圖標</label>
+                                <Switch
+                                    checked={formData.check_in_icon_type === 'custom'}
+                                    onCheckedChange={(checked) =>
+                                        setFormData({
+                                            ...formData,
+                                            check_in_icon_type: checked ? 'custom' : 'default',
+                                            check_in_icon_url: checked
+                                                ? formData.check_in_icon_url
+                                                : ''
+                                        })
+                                    }
+                                />
+                            </div>
+
+                            {formData.check_in_icon_type === 'custom' && (
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium">上傳圖標</label>
+                                    <MediaUploader
+                                        onChange={(imageUrl) =>
+                                            setFormData({
+                                                ...formData,
+                                                check_in_icon_url: imageUrl || ''
+                                            })
+                                        }
+                                        isDisabled={isUpdating}
+                                        defaultValue={formData.check_in_icon_url}
+                                    />
+                                </div>
+                            )}
                         </div>
 
                         <div className="flex justify-end gap-4">
