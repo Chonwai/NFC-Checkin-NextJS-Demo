@@ -26,6 +26,7 @@ interface CreateActivityFormData {
     single_location_only: boolean;
     is_active: boolean;
     requires_contact_info: boolean;
+    game_id?: string;
 }
 
 export default function CreateActivity() {
@@ -49,7 +50,14 @@ export default function CreateActivity() {
             const payload = {
                 ...formData,
                 start_date: formatInputToUTC(formData.start_date),
-                end_date: formatInputToUTC(formData.end_date)
+                end_date: formatInputToUTC(formData.end_date),
+                meta: formData.requires_contact_info
+                    ? {
+                          subscription_api: {
+                              game_id: formData.game_id
+                          }
+                      }
+                    : undefined
             };
 
             const response = await createActivity({
@@ -167,14 +175,30 @@ export default function CreateActivity() {
                             />
                         </div>
 
-                        <div className="flex items-center justify-between">
-                            <label className="text-sm font-medium">需要收集聯絡資訊？</label>
-                            <Switch
-                                checked={formData.requires_contact_info}
-                                onCheckedChange={(checked) =>
-                                    setFormData({ ...formData, requires_contact_info: checked })
-                                }
-                            />
+                        <div className="space-y-4">
+                            <div className="flex items-center justify-between">
+                                <label className="text-sm font-medium">需要收集聯絡資訊？</label>
+                                <Switch
+                                    checked={formData.requires_contact_info}
+                                    onCheckedChange={(checked) =>
+                                        setFormData({ ...formData, requires_contact_info: checked })
+                                    }
+                                />
+                            </div>
+
+                            {formData.requires_contact_info && (
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium">Game ID</label>
+                                    <Input
+                                        value={formData.game_id || ''}
+                                        onChange={(e) =>
+                                            setFormData({ ...formData, game_id: e.target.value })
+                                        }
+                                        placeholder="請輸入外部系統的 Game ID"
+                                        required
+                                    />
+                                </div>
+                            )}
                         </div>
 
                         <div className="flex justify-end gap-4">
