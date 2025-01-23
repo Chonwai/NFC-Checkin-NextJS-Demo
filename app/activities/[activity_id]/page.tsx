@@ -94,47 +94,45 @@ export default function ActivityDetails({ params }: ActivityDetailsProps) {
                                         集點進度
                                     </h2>
                                     <div className="flex items-center justify-center gap-4 mb-4">
-                                        {activity.locations.map((location, locationIndex) =>
-                                            // 為每個地點創建相應數量的印章位置
-                                            Array.from({ length: activity.check_in_limit }).map(
-                                                (_, stampIndex) => {
-                                                    // 計算當前印章的總索引
-                                                    const totalIndex =
-                                                        locationIndex * activity.check_in_limit +
-                                                        stampIndex;
-                                                    const isCompleted =
-                                                        totalIndex < (checkins?.length || 0);
+                                        {checkins?.map((checkin, index) => {
+                                            // 根據打卡記錄找到對應的地點
+                                            const location = activity.locations.find(
+                                                (loc) => loc.id === checkin.location_id
+                                            );
 
-                                                    return (
-                                                        <div key={`${locationIndex}-${stampIndex}`}>
-                                                            {isCompleted ? (
-                                                                location.check_in_icon_type ===
-                                                                    'custom' &&
-                                                                location.check_in_icon_url ? (
-                                                                    <Image
-                                                                        src={
-                                                                            location.check_in_icon_url
-                                                                        }
-                                                                        alt="打卡圖標"
-                                                                        width={32}
-                                                                        height={32}
-                                                                        className="w-8 h-8"
-                                                                    />
-                                                                ) : (
-                                                                    <div className="bg-[#009f92] p-1.5 rounded-full">
-                                                                        <Star className="w-5 h-5 text-white" />
-                                                                    </div>
-                                                                )
-                                                            ) : (
-                                                                <div className="w-8 h-8 rounded-full border-2 border-dashed border-[#009f92] flex items-center justify-center">
-                                                                    <Star className="w-5 h-5 text-[#009f92]" />
-                                                                </div>
-                                                            )}
+                                            return (
+                                                <div key={index}>
+                                                    {location?.check_in_icon_type === 'custom' &&
+                                                    location?.check_in_icon_url ? (
+                                                        <Image
+                                                            src={location.check_in_icon_url}
+                                                            alt="打卡圖標"
+                                                            width={32}
+                                                            height={32}
+                                                            className="w-8 h-8"
+                                                        />
+                                                    ) : (
+                                                        <div className="bg-[#009f92] p-1.5 rounded-full">
+                                                            <Star className="w-5 h-5 text-white" />
                                                         </div>
-                                                    );
-                                                }
-                                            )
-                                        )}
+                                                    )}
+                                                </div>
+                                            );
+                                        })}
+                                        {/* 顯示剩餘未打卡的位置 */}
+                                        {Array.from({
+                                            length:
+                                                activity.check_in_limit *
+                                                    activity.locations.length -
+                                                (checkins?.length || 0)
+                                        }).map((_, index) => (
+                                            <div
+                                                key={`empty-${index}`}
+                                                className="w-8 h-8 rounded-full border-2 border-dashed border-[#009f92] flex items-center justify-center"
+                                            >
+                                                <Star className="w-5 h-5 text-[#009f92]" />
+                                            </div>
+                                        ))}
                                     </div>
                                     <p className="text-center text-[#00777b] font-medium">
                                         已收集 {checkins?.length || 0} /{' '}
