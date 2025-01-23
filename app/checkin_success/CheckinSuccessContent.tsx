@@ -14,15 +14,20 @@ import { Button } from '@/components/ui/button';
 import { useActivity } from '@/hooks/useActivity';
 import { Check, MapPin, Calendar, Info } from 'lucide-react';
 import { ActivityInfoModal } from '@/components/ActivityInfoModal';
+import { ContactInfoModal } from '@/components/ContactInfoModal';
+import { useContactInfo } from '@/hooks/useContactInfo';
 
 export default function CheckinSuccessContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const activityId = searchParams.get('activity_id');
     const locationId = searchParams.get('location_id');
+    const requiresContactInfo = searchParams.get('requires_contact_info') === 'true';
+    const [showContactModal, setShowContactModal] = useState(false);
 
     const { activity, isLoading } = useActivity(activityId);
     const [locationName, setLocationName] = useState<string | null>(null);
+    const { submitContactInfo, isLoading: isSubmitting } = useContactInfo();
 
     useEffect(() => {
         if (activity && locationId) {
@@ -32,6 +37,12 @@ export default function CheckinSuccessContent() {
             }
         }
     }, [activity, locationId]);
+
+    useEffect(() => {
+        if (requiresContactInfo) {
+            setShowContactModal(true);
+        }
+    }, [requiresContactInfo]);
 
     return (
         <div className="min-h-screen bg-[#00777b] py-8">
@@ -104,6 +115,14 @@ export default function CheckinSuccessContent() {
                     </Button>
                 </CardFooter>
             </Card>
+
+            {showContactModal && (
+                <ContactInfoModal
+                    isOpen={showContactModal}
+                    onClose={() => setShowContactModal(false)}
+                    onSubmit={submitContactInfo}
+                />
+            )}
         </div>
     );
 }

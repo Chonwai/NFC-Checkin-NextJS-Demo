@@ -21,6 +21,7 @@ interface CheckinResponse
             created_at: string;
             updated_at: string;
         };
+        requires_contact_info: boolean;
     }> {}
 
 interface UseCheckinResult {

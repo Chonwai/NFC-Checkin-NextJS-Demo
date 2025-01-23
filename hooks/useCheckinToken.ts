@@ -19,6 +19,7 @@ interface CheckinWithTokenResponse
             created_at: string;
             updated_at: string;
         };
+        requires_contact_info: boolean;
     }> {}
 
 interface ErrorResponse {
@@ -37,12 +38,25 @@ interface UseCheckinTokenResult {
     isLoading: boolean;
     error: string | null;
     isSuccess: boolean;
+    data?: {
+        requires_contact_info: boolean;
+        check_in: {
+            id: string;
+            temp_user_id: string;
+            location_id: string;
+            checkin_time: string;
+            meta: Record<string, any>;
+            created_at: string;
+            updated_at: string;
+        } | null;
+    };
 }
 
 export function useCheckinToken(): UseCheckinTokenResult {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [isSuccess, setIsSuccess] = useState(false);
+    const [data, setData] = useState<UseCheckinTokenResult['data']>();
 
     const performCheckin = async (activityId: string, locationId: string, deviceId: string) => {
         setIsLoading(true);
@@ -109,6 +123,11 @@ export function useCheckinToken(): UseCheckinTokenResult {
                 throw new Error(errorMessage || '打卡失敗');
             }
 
+            setData({
+                requires_contact_info:
+                    (checkinData as CheckinWithTokenResponse).data?.requires_contact_info || false,
+                check_in: (checkinData as CheckinWithTokenResponse).data?.check_in || null
+            });
             setIsSuccess(true);
         } catch (err: any) {
             setError(err.message || '未知錯誤');
@@ -118,5 +137,5 @@ export function useCheckinToken(): UseCheckinTokenResult {
         }
     };
 
-    return { performCheckin, isLoading, error, isSuccess };
+    return { performCheckin, isLoading, error, isSuccess, data };
 }

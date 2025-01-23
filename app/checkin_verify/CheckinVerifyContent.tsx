@@ -10,7 +10,7 @@ import { Loader2 } from 'lucide-react';
 export default function CheckinVerifyContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const { performCheckin, isLoading, error, isSuccess } = useCheckinToken();
+    const { performCheckin, isLoading, error, isSuccess, data } = useCheckinToken();
     const [deviceId, setDeviceId] = useState<string | null>(null);
 
     const activityId = searchParams.get('activity_id');
@@ -37,9 +37,14 @@ export default function CheckinVerifyContent() {
 
     useEffect(() => {
         if (isSuccess && activityId && locationId) {
-            router.push(`/checkin_success?activity_id=${activityId}&location_id=${locationId}`);
+            console.log('data', data);
+            const requiresContactInfo = data?.requires_contact_info || false;
+            console.log('requiresContactInfo', requiresContactInfo);
+            router.push(
+                `/checkin_success?activity_id=${activityId}&location_id=${locationId}&requires_contact_info=${requiresContactInfo}`
+            );
         }
-    }, [isSuccess, activityId, locationId, router]);
+    }, [isSuccess, activityId, locationId, router, data]);
 
     useEffect(() => {
         if (error) {
