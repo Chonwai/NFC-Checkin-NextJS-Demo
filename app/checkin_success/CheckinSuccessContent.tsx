@@ -145,7 +145,7 @@ export default function CheckinSuccessContent() {
                 <ContactInfoModal
                     isOpen={showContactModal}
                     onClose={() => setShowContactModal(false)}
-                    onSubmit={submitContactInfo}
+                    onSubmit={(data) => submitContactInfo(data, activityId!)}
                 />
             )}
         </div>

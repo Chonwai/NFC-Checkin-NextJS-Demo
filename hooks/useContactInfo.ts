@@ -10,7 +10,7 @@ interface ContactInfoData {
 }
 
 interface UseContactInfoResult {
-    submitContactInfo: (data: ContactInfoData) => Promise<void>;
+    submitContactInfo: (data: ContactInfoData, activityId: string) => Promise<void>;
     isLoading: boolean;
     error: string | null;
     isSuccess: boolean;
@@ -21,20 +21,25 @@ export function useContactInfo(): UseContactInfoResult {
     const [error, setError] = useState<string | null>(null);
     const [isSuccess, setIsSuccess] = useState(false);
 
-    const submitContactInfo = async (data: ContactInfoData) => {
+    const submitContactInfo = async (data: ContactInfoData, activityId: string) => {
         setIsLoading(true);
         setError(null);
         try {
             const deviceId = await getDeviceId();
             const response = await fetch(
-                `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/user/contact-info`,
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/activities/${activityId}/temp_users/update_contact_info`,
                 {
-                    method: 'POST',
+                    method: 'PATCH',
                     headers: {
                         'Content-Type': 'application/json',
                         'X-Temp-User-Token': deviceId
                     },
-                    body: JSON.stringify(data)
+                    body: JSON.stringify({
+                        temp_user: {
+                            phone: data.phone,
+                            email: data.email
+                        }
+                    })
                 }
             );
 
