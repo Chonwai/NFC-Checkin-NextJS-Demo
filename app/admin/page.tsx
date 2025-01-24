@@ -7,6 +7,7 @@ import { Activity, Users, CheckSquare, TrendingUp, Clock, MapPin } from 'lucide-
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useLocationsData } from '@/hooks/admin/useLocationsData';
 import { useUserActivityTrend } from '@/hooks/admin/useUserActivityTrend';
+import Link from 'next/link';
 
 export default function AdminDashboard() {
     const { stats, isLoading, error } = useDashboardStats();
@@ -111,7 +112,23 @@ export default function AdminDashboard() {
                                     {activitiesData.map((activity, index) => (
                                         <div key={index} className="border rounded-lg p-4">
                                             <div className="flex justify-between items-center mb-2">
-                                                <h3 className="font-semibold">{activity.name}</h3>
+                                                {activity.id ? (
+                                                    <Link
+                                                        href={`/admin/activities/${activity.id}/edit`}
+                                                        className="hover:text-primary transition-colors hover:underline flex items-center gap-1"
+                                                    >
+                                                        <h3 className="font-semibold">
+                                                            {activity.name}
+                                                        </h3>
+                                                        <span className="text-xs text-muted-foreground">
+                                                            (點擊查看詳情)
+                                                        </span>
+                                                    </Link>
+                                                ) : (
+                                                    <h3 className="font-semibold">
+                                                        {activity.name}
+                                                    </h3>
+                                                )}
                                                 <span
                                                     className={`px-2 py-1 rounded text-sm ${
                                                         activity.status === '進行中'

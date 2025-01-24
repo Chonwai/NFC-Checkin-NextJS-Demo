@@ -25,6 +25,7 @@ export interface DashboardResponse {
 }
 
 export interface ActivityData {
+    id: string;
     name: string;
     total_users: number;
     total_check_ins: number;
