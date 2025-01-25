@@ -6,12 +6,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { TrendingUp, Users, MapPin, Clock, FileText } from 'lucide-react';
 import Link from 'next/link';
-import EditActivityContent from './edit/EditActivityContent';
 import { ActivityStats } from '@/components/admin/activities/ActivityStats';
 import { ActivityParticipants } from '@/components/admin/activities/ActivityParticipants';
 import { ActivityLogs } from '@/components/admin/activities/ActivityLogs';
 
-export default function ActivityPage({ params }: { params: { id: string } }) {
+export default function ActivityPage({ params }: any) {
     const { activity, isLoading } = useActivity(params.id);
 
     if (isLoading) {
