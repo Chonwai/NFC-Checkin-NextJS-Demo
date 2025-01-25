@@ -162,7 +162,10 @@ export function ActivityParticipants({ activityId }: { activityId: string }) {
                                         <TableCell>
                                             <div className="space-y-1">
                                                 <div className="font-medium">
-                                                    {participant.check_in_count} 次
+                                                    {participant.check_in_progress}
+                                                </div>
+                                                <div className="text-xs text-muted-foreground mb-1">
+                                                    {participant.location_progress}
                                                 </div>
                                                 <div className="w-full bg-gray-200 rounded-full h-2.5">
                                                     <div

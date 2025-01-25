@@ -3,6 +3,12 @@
 import { useState, useEffect } from 'react';
 import { adminFetch } from '@/utils/adminFetch';
 
+interface ActivityInfo {
+    type: 'single_location' | 'multiple_locations';
+    check_in_limit: number;
+    total_locations: number;
+}
+
 interface Participant {
     user_id: string;
     device_id: string;
@@ -12,6 +18,9 @@ interface Participant {
     check_in_count: number;
     first_check_in: string;
     last_check_in: string;
+    completed_locations: number;
+    location_progress: string;
+    check_in_progress: string;
     completion_status: string;
     completion_percentage: number;
 }
@@ -26,6 +35,7 @@ interface PaginationInfo {
 
 interface UseActivityParticipantsResult {
     participants: Participant[];
+    activity_info: ActivityInfo;
     pagination: PaginationInfo;
     isLoading: boolean;
     error: string | null;
@@ -45,6 +55,11 @@ export function useActivityParticipants(
     params: FetchParticipantsParams = {}
 ): UseActivityParticipantsResult {
     const [participants, setParticipants] = useState<Participant[]>([]);
+    const [activityInfo, setActivityInfo] = useState<ActivityInfo>({
+        type: 'single_location',
+        check_in_limit: 0,
+        total_locations: 1
+    });
     const [pagination, setPagination] = useState<PaginationInfo>({
         total: 0,
         current_page: 1,
@@ -71,6 +86,7 @@ export function useActivityParticipants(
 
             if (response.success && response.data) {
                 setParticipants(response.data.participants);
+                setActivityInfo(response.data.activity_info);
                 setPagination(response.data.pagination);
                 setError(null);
             } else {
@@ -89,6 +105,7 @@ export function useActivityParticipants(
 
     return {
         participants,
+        activity_info: activityInfo,
         pagination,
         isLoading,
         error,
