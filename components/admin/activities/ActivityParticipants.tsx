@@ -134,7 +134,7 @@ export function ActivityParticipants({ activityId }: { activityId: string }) {
                                         <TableCell>
                                             <div className="space-y-1">
                                                 <div className="font-medium">
-                                                    {participant.name}
+                                                    {participant.user_id.slice(0, 8)}...
                                                 </div>
                                                 <div className="space-y-1 text-sm text-muted-foreground">
                                                     {participant.phone && (
