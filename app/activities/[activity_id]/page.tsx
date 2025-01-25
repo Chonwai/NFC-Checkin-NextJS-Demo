@@ -93,7 +93,7 @@ export default function ActivityDetails({ params }: ActivityDetailsProps) {
                                     <h2 className="text-xl font-rubik text-[#00777b] mb-4 text-center">
                                         集點進度
                                     </h2>
-                                    <div className="flex items-center justify-center gap-4 mb-4">
+                                    <div className="flex flex-wrap items-center justify-center gap-4 mb-4">
                                         {checkins?.map((checkin, index) => {
                                             // 根據打卡記錄找到對應的地點
                                             const location = activity.locations.find(
