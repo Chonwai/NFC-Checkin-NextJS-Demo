@@ -7,6 +7,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { TrendingUp, Users, MapPin, Clock, FileText } from 'lucide-react';
 import Link from 'next/link';
 import EditActivityContent from './edit/EditActivityContent';
+import { ActivityStats } from '@/components/admin/activities/ActivityStats';
+import { ActivityParticipants } from '@/components/admin/activities/ActivityParticipants';
+import { ActivityLogs } from '@/components/admin/activities/ActivityLogs';
 
 export default function ActivityPage({ params }: { params: { id: string } }) {
     const { activity, isLoading } = useActivity(params.id);
@@ -157,39 +160,15 @@ export default function ActivityPage({ params }: { params: { id: string } }) {
                 </TabsContent>
 
                 <TabsContent value="participants">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>參與者列表</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            {/* 將在後續實現 */}
-                            <div>參與者列表將在這裡顯示</div>
-                        </CardContent>
-                    </Card>
+                    <ActivityParticipants activityId={params.id} />
                 </TabsContent>
 
                 <TabsContent value="stats">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>數據分析</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            {/* 將在後續實現 */}
-                            <div>數據分析將在這裡顯示</div>
-                        </CardContent>
-                    </Card>
+                    <ActivityStats activityId={params.id} />
                 </TabsContent>
 
                 <TabsContent value="logs">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>活動日誌</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            {/* 將在後續實現 */}
-                            <div>活動日誌將在這裡顯示</div>
-                        </CardContent>
-                    </Card>
+                    <ActivityLogs activityId={params.id} />
                 </TabsContent>
             </Tabs>
         </div>
