@@ -12,7 +12,7 @@ import {
     SelectValue
 } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight, Search } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Search, Download } from 'lucide-react';
 
 export function ActivityLogs({ activityId }: { activityId: string }) {
     const [searchQuery, setSearchQuery] = useState('');
@@ -36,6 +36,35 @@ export function ActivityLogs({ activityId }: { activityId: string }) {
     const handleSearch = (value: string) => {
         setSearchQuery(value);
         setCurrentPage(1);
+    };
+
+    const exportToCSV = () => {
+        if (!logs) return;
+
+        // Create CSV headers
+        const headers = ['User ID', 'Action', 'Location', 'Timestamp'];
+
+        // Convert logs to CSV format
+        const csvData = logs.map((log) => [
+            log.details.user_name,
+            log.action,
+            log.details.location_name,
+            new Date(log.timestamp).toLocaleString()
+        ]);
+
+        // Combine headers and data
+        const csvContent = [headers.join(','), ...csvData.map((row) => row.join(','))].join('\n');
+
+        // Create blob and download
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', `activity-${activityId}-logs.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     };
 
     if (isLoading) {
@@ -109,6 +138,15 @@ export function ActivityLogs({ activityId }: { activityId: string }) {
                         </SelectContent>
                     </Select>
                 </div>
+                <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={exportToCSV}
+                    disabled={!logs || logs.length === 0}
+                >
+                    <Download className="h-4 w-4 mr-2" />
+                    Export CSV
+                </Button>
             </div>
 
             <Card>
