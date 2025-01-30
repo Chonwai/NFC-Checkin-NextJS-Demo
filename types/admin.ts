@@ -254,3 +254,37 @@ export interface CompletionTrendResponse {
         message: string;
     };
 }
+
+export interface ParticipationRequirement {
+    type: 'location' | 'reward';
+    count: number;
+    description: string;
+}
+
+export interface ParticipationInfo {
+    requirements: ParticipationRequirement[];
+    notices: string[];
+}
+
+export interface ActivityMeta {
+    reward_api?: {
+        issue_endpoint: string;
+        query_endpoint: string;
+    };
+    subscription_api?: {
+        game_id: string;
+    };
+    participation_info?: ParticipationInfo;
+}
+
+export interface EditActivityFormData {
+    name: string;
+    description: string;
+    start_date: string;
+    end_date: string;
+    check_in_limit: number;
+    single_location_only: boolean;
+    is_active: boolean;
+    requires_contact_info: boolean;
+    meta?: ActivityMeta;
+}

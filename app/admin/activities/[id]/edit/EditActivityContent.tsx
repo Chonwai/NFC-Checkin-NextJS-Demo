@@ -16,6 +16,15 @@ import {
     formatUTCToZonedInput,
     formatInputToUTC
 } from '@/utils/dateTime';
+import { ActivityMeta, ParticipationRequirement } from '@/types/admin';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue
+} from '@/components/ui/select';
+import { Plus, Trash2 } from 'lucide-react';
 
 interface EditActivityFormData {
     name: string;
@@ -26,6 +35,16 @@ interface EditActivityFormData {
     single_location_only: boolean;
     is_active: boolean;
     requires_contact_info: boolean;
+    participation_info?: {
+        requirements: ParticipationRequirement[];
+        notices: string[];
+    };
+    meta: {
+        participation_info?: {
+            requirements: ParticipationRequirement[];
+            notices: string[];
+        };
+    };
 }
 
 export default function EditActivityContent({ activityId }: { activityId: string }) {
@@ -41,20 +60,26 @@ export default function EditActivityContent({ activityId }: { activityId: string
         check_in_limit: 1,
         single_location_only: true,
         is_active: true,
-        requires_contact_info: false
+        requires_contact_info: false,
+        meta: {
+            participation_info: {
+                requirements: [],
+                notices: []
+            }
+        }
     });
 
     useEffect(() => {
         if (activity) {
             setFormData({
-                name: activity.name,
-                description: activity.description,
-                start_date: formatUTCToZonedInput(activity.start_date),
-                end_date: formatUTCToZonedInput(activity.end_date),
-                check_in_limit: activity.check_in_limit,
-                single_location_only: activity.single_location_only,
-                is_active: activity.is_active,
-                requires_contact_info: activity.requires_contact_info
+                ...activity,
+                meta: {
+                    ...activity.meta,
+                    participation_info: activity.participation_info || {
+                        requirements: [],
+                        notices: []
+                    }
+                }
             });
         }
     }, [activity]);
@@ -65,7 +90,14 @@ export default function EditActivityContent({ activityId }: { activityId: string
             const payload = {
                 ...formData,
                 start_date: formatInputToUTC(formData.start_date),
-                end_date: formatInputToUTC(formData.end_date)
+                end_date: formatInputToUTC(formData.end_date),
+                meta: {
+                    ...formData.meta,
+                    participation_info: formData.meta?.participation_info || {
+                        requirements: [],
+                        notices: []
+                    }
+                }
             };
 
             const response = await updateActivity(activityId, {
@@ -196,6 +228,253 @@ export default function EditActivityContent({ activityId }: { activityId: string
                                     setFormData({ ...formData, requires_contact_info: checked })
                                 }
                             />
+                        </div>
+
+                        <div className="space-y-4">
+                            <h3 className="text-lg font-medium">參與方式設定</h3>
+
+                            {/* 參與要求 */}
+                            <div className="space-y-2">
+                                <div className="flex items-center justify-between">
+                                    <label className="text-sm font-medium">參與要求</label>
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => {
+                                            const newRequirements = [
+                                                ...(formData.meta?.participation_info
+                                                    ?.requirements || []),
+                                                {
+                                                    type: 'location',
+                                                    count: 1,
+                                                    description: ''
+                                                }
+                                            ];
+                                            setFormData({
+                                                ...formData,
+                                                meta: {
+                                                    ...formData.meta,
+                                                    participation_info: {
+                                                        ...formData.meta?.participation_info,
+                                                        requirements: newRequirements
+                                                    }
+                                                }
+                                            });
+                                        }}
+                                    >
+                                        <Plus className="h-4 w-4 mr-2" />
+                                        新增要求
+                                    </Button>
+                                </div>
+
+                                {formData.meta?.participation_info?.requirements?.map(
+                                    (req, index) => (
+                                        <div
+                                            key={index}
+                                            className="flex items-start gap-2 bg-gray-50 p-3 rounded-lg"
+                                        >
+                                            <Select
+                                                value={req.type}
+                                                onValueChange={(value) => {
+                                                    const newRequirements = [
+                                                        ...formData.meta!.participation_info!
+                                                            .requirements
+                                                    ];
+                                                    newRequirements[index] = {
+                                                        ...newRequirements[index],
+                                                        type: value as 'location' | 'reward'
+                                                    };
+                                                    setFormData({
+                                                        ...formData,
+                                                        meta: {
+                                                            ...formData.meta,
+                                                            participation_info: {
+                                                                ...formData.meta
+                                                                    ?.participation_info,
+                                                                requirements: newRequirements
+                                                            }
+                                                        }
+                                                    });
+                                                }}
+                                            >
+                                                <SelectTrigger className="w-[120px]">
+                                                    <SelectValue placeholder="類型" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="location">
+                                                        地點要求
+                                                    </SelectItem>
+                                                    <SelectItem value="reward">獎勵要求</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+
+                                            <Input
+                                                type="number"
+                                                min="1"
+                                                className="w-[100px]"
+                                                value={req.count}
+                                                onChange={(e) => {
+                                                    const newRequirements = [
+                                                        ...formData.meta!.participation_info!
+                                                            .requirements
+                                                    ];
+                                                    newRequirements[index] = {
+                                                        ...newRequirements[index],
+                                                        count: parseInt(e.target.value)
+                                                    };
+                                                    setFormData({
+                                                        ...formData,
+                                                        meta: {
+                                                            ...formData.meta,
+                                                            participation_info: {
+                                                                ...formData.meta
+                                                                    ?.participation_info,
+                                                                requirements: newRequirements
+                                                            }
+                                                        }
+                                                    });
+                                                }}
+                                            />
+
+                                            <Input
+                                                className="flex-1"
+                                                value={req.description}
+                                                onChange={(e) => {
+                                                    const newRequirements = [
+                                                        ...formData.meta!.participation_info!
+                                                            .requirements
+                                                    ];
+                                                    newRequirements[index] = {
+                                                        ...newRequirements[index],
+                                                        description: e.target.value
+                                                    };
+                                                    setFormData({
+                                                        ...formData,
+                                                        meta: {
+                                                            ...formData.meta,
+                                                            participation_info: {
+                                                                ...formData.meta
+                                                                    ?.participation_info,
+                                                                requirements: newRequirements
+                                                            }
+                                                        }
+                                                    });
+                                                }}
+                                                placeholder="輸入要求描述"
+                                            />
+
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                onClick={() => {
+                                                    const newRequirements =
+                                                        formData.meta!.participation_info!.requirements.filter(
+                                                            (_, i) => i !== index
+                                                        );
+                                                    setFormData({
+                                                        ...formData,
+                                                        meta: {
+                                                            ...formData.meta,
+                                                            participation_info: {
+                                                                ...formData.meta
+                                                                    ?.participation_info,
+                                                                requirements: newRequirements
+                                                            }
+                                                        }
+                                                    });
+                                                }}
+                                            >
+                                                <Trash2 className="h-4 w-4 text-red-500" />
+                                            </Button>
+                                        </div>
+                                    )
+                                )}
+                            </div>
+
+                            {/* 注意事項 */}
+                            <div className="space-y-2">
+                                <div className="flex items-center justify-between">
+                                    <label className="text-sm font-medium">注意事項</label>
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => {
+                                            const newNotices = [
+                                                ...(formData.meta?.participation_info?.notices ||
+                                                    []),
+                                                ''
+                                            ];
+                                            setFormData({
+                                                ...formData,
+                                                meta: {
+                                                    ...formData.meta,
+                                                    participation_info: {
+                                                        ...formData.meta?.participation_info,
+                                                        notices: newNotices
+                                                    }
+                                                }
+                                            });
+                                        }}
+                                    >
+                                        <Plus className="h-4 w-4 mr-2" />
+                                        新增注意事項
+                                    </Button>
+                                </div>
+
+                                {formData.meta?.participation_info?.notices?.map(
+                                    (notice, index) => (
+                                        <div key={index} className="flex items-center gap-2">
+                                            <Input
+                                                value={notice}
+                                                onChange={(e) => {
+                                                    const newNotices = [
+                                                        ...formData.meta!.participation_info!
+                                                            .notices
+                                                    ];
+                                                    newNotices[index] = e.target.value;
+                                                    setFormData({
+                                                        ...formData,
+                                                        meta: {
+                                                            ...formData.meta,
+                                                            participation_info: {
+                                                                ...formData.meta
+                                                                    ?.participation_info,
+                                                                notices: newNotices
+                                                            }
+                                                        }
+                                                    });
+                                                }}
+                                                placeholder="輸入注意事項"
+                                            />
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                onClick={() => {
+                                                    const newNotices =
+                                                        formData.meta!.participation_info!.notices.filter(
+                                                            (_, i) => i !== index
+                                                        );
+                                                    setFormData({
+                                                        ...formData,
+                                                        meta: {
+                                                            ...formData.meta,
+                                                            participation_info: {
+                                                                ...formData.meta
+                                                                    ?.participation_info,
+                                                                notices: newNotices
+                                                            }
+                                                        }
+                                                    });
+                                                }}
+                                            >
+                                                <Trash2 className="h-4 w-4 text-red-500" />
+                                            </Button>
+                                        </div>
+                                    )
+                                )}
+                            </div>
                         </div>
 
                         <div className="flex justify-end gap-4">
