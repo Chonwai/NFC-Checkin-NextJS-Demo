@@ -24,7 +24,10 @@ import {
     SelectTrigger,
     SelectValue
 } from '@/components/ui/select';
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2, Eye } from 'lucide-react';
+import { PARTICIPATION_TEMPLATES } from '@/constants/participationTemplates';
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import { ActivityInfoModal } from '@/components/ActivityInfoModal';
 
 interface EditActivityFormData {
     name: string;
@@ -231,7 +234,66 @@ export default function EditActivityContent({ activityId }: { activityId: string
                         </div>
 
                         <div className="space-y-4">
-                            <h3 className="text-lg font-medium">參與方式設定</h3>
+                            <div className="flex items-center justify-between">
+                                <h3 className="text-lg font-medium">參與方式設定</h3>
+                                <div className="flex gap-2">
+                                    <Select
+                                        onValueChange={(value) => {
+                                            const template = PARTICIPATION_TEMPLATES.find(
+                                                (t) => t.name === value
+                                            );
+                                            if (template) {
+                                                setFormData({
+                                                    ...formData,
+                                                    meta: {
+                                                        ...formData.meta,
+                                                        participation_info: {
+                                                            requirements: [
+                                                                ...template.requirements
+                                                            ],
+                                                            notices: [...template.notices]
+                                                        }
+                                                    }
+                                                });
+                                            }
+                                        }}
+                                    >
+                                        <SelectTrigger className="w-[200px]">
+                                            <SelectValue placeholder="選擇模板" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {PARTICIPATION_TEMPLATES.map((template) => (
+                                                <SelectItem
+                                                    key={template.name}
+                                                    value={template.name}
+                                                >
+                                                    {template.name}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+
+                                    <Dialog>
+                                        <DialogTrigger asChild>
+                                            <Button variant="outline" size="sm">
+                                                <Eye className="h-4 w-4 mr-2" />
+                                                預覽
+                                            </Button>
+                                        </DialogTrigger>
+                                        <DialogContent className="max-w-lg">
+                                            <ActivityInfoModal
+                                                activity={{
+                                                    ...formData,
+                                                    participation_info:
+                                                        formData.meta?.participation_info
+                                                }}
+                                            >
+                                                <div />
+                                            </ActivityInfoModal>
+                                        </DialogContent>
+                                    </Dialog>
+                                </div>
+                            </div>
 
                             {/* 參與要求 */}
                             <div className="space-y-2">
