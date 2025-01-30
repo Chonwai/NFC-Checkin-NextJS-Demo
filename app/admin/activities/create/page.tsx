@@ -27,6 +27,7 @@ import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { ActivityInfoModal } from '@/components/ActivityInfoModal';
 import { Plus, Eye, Trash2 } from 'lucide-react';
 import { PARTICIPATION_TEMPLATES } from '@/constants/participationTemplates';
+import { ParticipationRequirement } from '@/types/admin';
 
 interface CreateActivityFormData {
     name: string;
@@ -40,7 +41,7 @@ interface CreateActivityFormData {
     game_id?: string;
     meta: {
         participation_info: {
-            requirements: string[];
+            requirements: ParticipationRequirement[];
             notices: string[];
         };
     };
@@ -246,6 +247,9 @@ export default function CreateActivity() {
                                                                 ...template.requirements
                                                             ],
                                                             notices: [...template.notices]
+                                                        } as {
+                                                            requirements: ParticipationRequirement[];
+                                                            notices: string[];
                                                         }
                                                     }
                                                 });
@@ -312,7 +316,8 @@ export default function CreateActivity() {
                                                     ...formData.meta,
                                                     participation_info: {
                                                         ...formData.meta?.participation_info,
-                                                        requirements: newRequirements
+                                                        requirements:
+                                                            newRequirements as ParticipationRequirement[]
                                                     }
                                                 }
                                             });

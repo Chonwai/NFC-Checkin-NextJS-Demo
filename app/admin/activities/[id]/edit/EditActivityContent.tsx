@@ -78,7 +78,7 @@ export default function EditActivityContent({ activityId }: { activityId: string
                 ...activity,
                 meta: {
                     ...activity.meta,
-                    participation_info: activity.participation_info || {
+                    participation_info: activity.meta?.participation_info || {
                         requirements: [],
                         notices: []
                     }
@@ -319,7 +319,11 @@ export default function EditActivityContent({ activityId }: { activityId: string
                                                     ...formData.meta,
                                                     participation_info: {
                                                         ...formData.meta?.participation_info,
-                                                        requirements: newRequirements
+                                                        requirements:
+                                                            newRequirements as ParticipationRequirement[]
+                                                    } as {
+                                                        requirements: ParticipationRequirement[];
+                                                        notices: string[];
                                                     }
                                                 }
                                             });
@@ -355,6 +359,9 @@ export default function EditActivityContent({ activityId }: { activityId: string
                                                                 ...formData.meta
                                                                     ?.participation_info,
                                                                 requirements: newRequirements
+                                                            } as {
+                                                                requirements: ParticipationRequirement[];
+                                                                notices: string[];
                                                             }
                                                         }
                                                     });
@@ -393,6 +400,9 @@ export default function EditActivityContent({ activityId }: { activityId: string
                                                                 ...formData.meta
                                                                     ?.participation_info,
                                                                 requirements: newRequirements
+                                                            } as {
+                                                                requirements: ParticipationRequirement[];
+                                                                notices: string[];
                                                             }
                                                         }
                                                     });
@@ -419,6 +429,9 @@ export default function EditActivityContent({ activityId }: { activityId: string
                                                                 ...formData.meta
                                                                     ?.participation_info,
                                                                 requirements: newRequirements
+                                                            } as {
+                                                                requirements: ParticipationRequirement[];
+                                                                notices: string[];
                                                             }
                                                         }
                                                     });
@@ -442,6 +455,9 @@ export default function EditActivityContent({ activityId }: { activityId: string
                                                                 ...formData.meta
                                                                     ?.participation_info,
                                                                 requirements: newRequirements
+                                                            } as {
+                                                                requirements: ParticipationRequirement[];
+                                                                notices: string[];
                                                             }
                                                         }
                                                     });
@@ -475,6 +491,9 @@ export default function EditActivityContent({ activityId }: { activityId: string
                                                     participation_info: {
                                                         ...formData.meta?.participation_info,
                                                         notices: newNotices
+                                                    } as {
+                                                        requirements: ParticipationRequirement[];
+                                                        notices: string[];
                                                     }
                                                 }
                                             });
@@ -504,6 +523,9 @@ export default function EditActivityContent({ activityId }: { activityId: string
                                                                 ...formData.meta
                                                                     ?.participation_info,
                                                                 notices: newNotices
+                                                            } as {
+                                                                requirements: ParticipationRequirement[];
+                                                                notices: string[];
                                                             }
                                                         }
                                                     });
@@ -526,6 +548,9 @@ export default function EditActivityContent({ activityId }: { activityId: string
                                                                 ...formData.meta
                                                                     ?.participation_info,
                                                                 notices: newNotices
+                                                            } as {
+                                                                requirements: ParticipationRequirement[];
+                                                                notices: string[];
                                                             }
                                                         }
                                                     });

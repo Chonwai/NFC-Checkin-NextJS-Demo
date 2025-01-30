@@ -44,7 +44,7 @@ export default function CheckinVerifyContent() {
                 `/checkin_success?activity_id=${activityId}&location_id=${locationId}&requires_contact_info=${requiresContactInfo}`
             );
         }
-    }, [isSuccess, activityId, locationId, router, data]);
+    }, [isSuccess, activityId, locationId, data, router]);
 
     useEffect(() => {
         if (error) {

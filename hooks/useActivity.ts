@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { ApiResponse } from '@/types/api';
+import { ParticipationRequirement } from '@/types/admin';
 
 interface ActivityDetailsResponse
     extends ApiResponse<{
@@ -22,6 +23,10 @@ interface Activity {
     locations: Location[];
     is_active: boolean;
     requires_contact_info: boolean;
+    participation_info?: {
+        requirements: ParticipationRequirement[];
+        notices: string[];
+    };
 }
 
 interface Location {
