@@ -28,6 +28,7 @@ import { ActivityInfoModal } from '@/components/ActivityInfoModal';
 import { Plus, Eye, Trash2 } from 'lucide-react';
 import { PARTICIPATION_TEMPLATES } from '@/constants/participationTemplates';
 import { ParticipationRequirement } from '@/types/admin';
+import { RewardMode } from '@/types/admin';
 
 interface CreateActivityFormData {
     name: string;
@@ -38,13 +39,15 @@ interface CreateActivityFormData {
     single_location_only: boolean;
     is_active: boolean;
     requires_contact_info: boolean;
-    game_id?: string;
+    reward_mode: RewardMode;
     meta: {
         participation_info: {
             requirements: ParticipationRequirement[];
             notices: string[];
         };
+        reward_threshold?: number;
     };
+    game_id?: string;
 }
 
 export default function CreateActivity() {
@@ -60,11 +63,13 @@ export default function CreateActivity() {
         single_location_only: true,
         is_active: true,
         requires_contact_info: false,
+        reward_mode: 'full',
         meta: {
             participation_info: {
                 requirements: [],
                 notices: []
-            }
+            },
+            reward_threshold: 1
         }
     });
 
@@ -72,24 +77,27 @@ export default function CreateActivity() {
         e.preventDefault();
         try {
             const payload = {
-                ...formData,
-                start_date: formatInputToUTC(formData.start_date),
-                end_date: formatInputToUTC(formData.end_date),
-                meta: {
-                    ...(formData.requires_contact_info
-                        ? {
-                              subscription_api: {
-                                  game_id: formData.game_id
+                activity: {
+                    ...formData,
+                    start_date: formatInputToUTC(formData.start_date),
+                    end_date: formatInputToUTC(formData.end_date),
+                    meta: {
+                        ...(formData.requires_contact_info
+                            ? {
+                                  subscription_api: {
+                                      game_id: formData.game_id
+                                  }
                               }
-                          }
-                        : {}),
-                    participation_info: formData.meta?.participation_info
+                            : {}),
+                        participation_info: formData.meta?.participation_info,
+                        ...(formData.reward_mode === 'partial' && {
+                            reward_threshold: formData.meta?.reward_threshold
+                        })
+                    }
                 }
             };
 
-            const response = await createActivity({
-                activity: payload
-            });
+            const response = await createActivity(payload);
 
             if (response.success) {
                 toast({
@@ -223,6 +231,51 @@ export default function CreateActivity() {
                                         }
                                         placeholder="請輸入外部系統的 Game ID"
                                         required
+                                    />
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="space-y-4">
+                            <div className="flex items-center justify-between">
+                                <label className="text-sm font-medium">獎勵模式</label>
+                                <Select
+                                    value={formData.reward_mode}
+                                    onValueChange={(value: RewardMode) =>
+                                        setFormData({ ...formData, reward_mode: value })
+                                    }
+                                >
+                                    <SelectTrigger className="w-[200px]">
+                                        <SelectValue placeholder="選擇獎勵模式" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="full">全部完成</SelectItem>
+                                        <SelectItem value="partial">部分完成</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            {formData.reward_mode === 'partial' && (
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium">獎勵門檻</label>
+                                    <Input
+                                        type="number"
+                                        min="1"
+                                        max={
+                                            formData.single_location_only
+                                                ? formData.check_in_limit
+                                                : undefined
+                                        }
+                                        value={formData.meta?.reward_threshold || ''}
+                                        onChange={(e) =>
+                                            setFormData({
+                                                ...formData,
+                                                meta: {
+                                                    ...formData.meta,
+                                                    reward_threshold: parseInt(e.target.value)
+                                                }
+                                            })
+                                        }
                                     />
                                 </div>
                             )}

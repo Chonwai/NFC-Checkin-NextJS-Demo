@@ -266,6 +266,8 @@ export interface ParticipationInfo {
     notices: string[];
 }
 
+export type RewardMode = 'full' | 'partial' | 'two_tier' | 'multi-tier';
+
 export interface ActivityMeta {
     reward_api?: {
         issue_endpoint: string;
@@ -275,6 +277,23 @@ export interface ActivityMeta {
         game_id: string;
     };
     participation_info?: ParticipationInfo;
+    reward_threshold?: number;
+    secondary_threshold?: number;
+    final_threshold?: number;
+}
+
+export interface CreateActivityFormData {
+    name: string;
+    description: string;
+    start_date: string;
+    end_date: string;
+    check_in_limit: number;
+    single_location_only: boolean;
+    is_active: boolean;
+    requires_contact_info: boolean;
+    reward_mode: RewardMode;
+    meta?: ActivityMeta;
+    game_id?: string;
 }
 
 export interface EditActivityFormData {
