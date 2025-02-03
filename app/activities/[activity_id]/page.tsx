@@ -167,22 +167,6 @@ export default function ActivityDetails({ params }: ActivityDetailsProps) {
                                                             />
                                                         )}
                                                     </>
-                                                ) : activity.user_reward_status?.check_in_count >=
-                                                  (activity.meta?.reward_threshold || 0) ? (
-                                                    <>
-                                                        <p className="text-[#009f92] text-sm mb-2">
-                                                            恭喜達到獎勵門檻！
-                                                        </p>
-                                                        {activity.meta?.reward_api && (
-                                                            <RewardModal
-                                                                activity={activity}
-                                                                tempUserId={
-                                                                    checkins?.[checkins.length - 1]
-                                                                        ?.temp_user_id
-                                                                }
-                                                            />
-                                                        )}
-                                                    </>
                                                 ) : (
                                                     <p className="text-[#009f92] text-sm">
                                                         還差{' '}
