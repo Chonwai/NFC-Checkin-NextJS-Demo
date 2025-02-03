@@ -140,8 +140,63 @@ export default function ActivityDetails({ params }: ActivityDetailsProps) {
                                     </p>
 
                                     {/* 新增完成打卡提示 */}
-                                    {checkins?.length ===
-                                        activity.check_in_limit * activity.locations.length && (
+                                    {activity.reward_mode === 'partial' ? (
+                                        <div className="mt-4 text-center">
+                                            <div className="bg-[#009f92]/10 rounded-lg p-4">
+                                                <div className="flex items-center justify-center gap-2 mb-2">
+                                                    <Gift className="w-6 h-6 text-[#009f92]" />
+                                                    <p className="text-[#00777b] font-medium">
+                                                        獎勵門檻進度：
+                                                        {activity.user_reward_status
+                                                            ?.check_in_count || 0}{' '}
+                                                        / {activity.meta?.reward_threshold} 個印章
+                                                    </p>
+                                                </div>
+                                                {activity.user_reward_status?.has_reward ? (
+                                                    <>
+                                                        <p className="text-[#009f92] text-sm mb-2">
+                                                            恭喜達到獎勵門檻！
+                                                        </p>
+                                                        {activity.meta?.reward_api && (
+                                                            <RewardModal
+                                                                activity={activity}
+                                                                tempUserId={
+                                                                    checkins?.[checkins.length - 1]
+                                                                        ?.temp_user_id
+                                                                }
+                                                            />
+                                                        )}
+                                                    </>
+                                                ) : activity.user_reward_status?.check_in_count >=
+                                                  (activity.meta?.reward_threshold || 0) ? (
+                                                    <>
+                                                        <p className="text-[#009f92] text-sm mb-2">
+                                                            恭喜達到獎勵門檻！
+                                                        </p>
+                                                        {activity.meta?.reward_api && (
+                                                            <RewardModal
+                                                                activity={activity}
+                                                                tempUserId={
+                                                                    checkins?.[checkins.length - 1]
+                                                                        ?.temp_user_id
+                                                                }
+                                                            />
+                                                        )}
+                                                    </>
+                                                ) : (
+                                                    <p className="text-[#009f92] text-sm">
+                                                        還差{' '}
+                                                        {(activity.meta?.reward_threshold || 0) -
+                                                            (activity.user_reward_status
+                                                                ?.check_in_count || 0)}{' '}
+                                                        個印章即可獲得獎勵
+                                                    </p>
+                                                )}
+                                            </div>
+                                        </div>
+                                    ) : activity.reward_mode === 'full' &&
+                                      checkins?.length ===
+                                          activity.check_in_limit * activity.locations.length ? (
                                         <div className="mt-4 text-center">
                                             <div className="bg-[#009f92]/10 rounded-lg p-4">
                                                 <Gift className="w-8 h-8 text-[#009f92] mx-auto mb-2" />
@@ -164,7 +219,7 @@ export default function ActivityDetails({ params }: ActivityDetailsProps) {
                                                 )}
                                             </div>
                                         </div>
-                                    )}
+                                    ) : null}
 
                                     {/* 打卡記錄 Modal */}
                                     <CheckinHistoryModal checkins={checkins || []} />
