@@ -17,6 +17,7 @@ import { ActivityInfoModal } from '@/components/ActivityInfoModal';
 import { ContactInfoModal } from '@/components/ContactInfoModal';
 import { useContactInfo } from '@/hooks/useContactInfo';
 import Image from 'next/image';
+import { getDeviceId } from '@/lib/device';
 
 export default function CheckinSuccessContent() {
     const router = useRouter();
@@ -26,9 +27,18 @@ export default function CheckinSuccessContent() {
     const requiresContactInfo = searchParams.get('requires_contact_info') === 'true';
     const [showContactModal, setShowContactModal] = useState(false);
 
-    const { activity, isLoading } = useActivity(activityId);
+    const [deviceId, setDeviceId] = useState<string | null>(null);
+    const { activity, isLoading } = useActivity(activityId, deviceId);
     const [locationName, setLocationName] = useState<string | null>(null);
     const { submitContactInfo, isLoading: isSubmitting } = useContactInfo();
+
+    useEffect(() => {
+        const fetchDeviceId = async () => {
+            const id = await getDeviceId();
+            setDeviceId(id);
+        };
+        fetchDeviceId();
+    }, []);
 
     useEffect(() => {
         if (activity && locationId) {

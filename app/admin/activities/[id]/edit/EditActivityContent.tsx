@@ -53,7 +53,8 @@ interface EditActivityFormData {
 export default function EditActivityContent({ activityId }: { activityId: string }) {
     const router = useRouter();
     const { toast } = useToast();
-    const { activity, isLoading: isLoadingActivity } = useActivity(activityId);
+    const [deviceId, setDeviceId] = useState<string | null>(null);
+    const { activity, isLoading: isLoadingActivity } = useActivity(activityId, deviceId);
     const { updateActivity, isLoading: isUpdating } = useUpdateActivity();
     const [formData, setFormData] = useState<EditActivityFormData>({
         name: '',

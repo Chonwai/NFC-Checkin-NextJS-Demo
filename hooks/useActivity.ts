@@ -23,9 +23,21 @@ interface Activity {
     locations: Location[];
     is_active: boolean;
     requires_contact_info: boolean;
-    participation_info?: {
-        requirements: ParticipationRequirement[];
+    participation_info: {
         notices: string[];
+        requirements: {
+            type: 'location' | 'reward';
+            count: number;
+            description: string;
+        }[];
+    };
+    reward_mode: 'full' | 'partial' | 'two_tier' | 'multi-tier';
+    user_reward_status?: {
+        has_reward: boolean;
+        reward_count: number;
+        check_in_count: number;
+        reward_threshold: number;
+        reward_mode: string;
     };
 }
 
@@ -48,7 +60,7 @@ interface UseActivityResult {
     error: string | null;
 }
 
-export function useActivity(activityId: string | null): UseActivityResult {
+export function useActivity(activityId: string | null, deviceId: string | null): UseActivityResult {
     const [activity, setActivity] = useState<Activity | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
@@ -64,7 +76,8 @@ export function useActivity(activityId: string | null): UseActivityResult {
                     {
                         method: 'GET',
                         headers: {
-                            'Content-Type': 'application/json'
+                            'Content-Type': 'application/json',
+                            'X-Temp-User-Token': deviceId || ''
                         }
                     }
                 );

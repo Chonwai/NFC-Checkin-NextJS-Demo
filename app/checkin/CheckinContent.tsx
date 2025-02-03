@@ -27,7 +27,7 @@ export default function CheckinContent() {
         activity,
         isLoading: isActivityLoading,
         error: activityError
-    } = useActivity(activityId);
+    } = useActivity(activityId, deviceId);
 
     const [locationName, setLocationName] = useState<string | null>(null);
 

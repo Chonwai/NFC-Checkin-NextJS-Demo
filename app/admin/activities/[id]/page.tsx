@@ -9,9 +9,11 @@ import Link from 'next/link';
 import { ActivityStats } from '@/components/admin/activities/ActivityStats';
 import { ActivityParticipants } from '@/components/admin/activities/ActivityParticipants';
 import { ActivityLogs } from '@/components/admin/activities/ActivityLogs';
+import { useState } from 'react';
 
 export default function ActivityPage({ params }: any) {
-    const { activity, isLoading } = useActivity(params.id);
+    const [deviceId, setDeviceId] = useState<string | null>(null);
+    const { activity, isLoading } = useActivity(params.id, deviceId);
 
     if (isLoading) {
         return <div>載入中...</div>;

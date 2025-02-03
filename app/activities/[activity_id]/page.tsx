@@ -34,15 +34,15 @@ interface ActivityDetailsProps {
 
 export default function ActivityDetails({ params }: ActivityDetailsProps) {
     const [activityId, setActivityId] = useState<string | null>(null);
+    const [deviceId, setDeviceId] = useState<string | null>(null);
 
     useEffect(() => {
         params.then(({ activity_id }) => setActivityId(activity_id));
     }, [params]);
 
-    const { activity, isLoading, error } = useActivity(activityId);
+    const { activity, isLoading, error } = useActivity(activityId, deviceId);
     const router = useRouter();
 
-    const [deviceId, setDeviceId] = useState<string | null>(null);
     const [tempUserId, setTempUserId] = useState<string | null>(null);
     const {
         checkins,
@@ -146,7 +146,7 @@ export default function ActivityDetails({ params }: ActivityDetailsProps) {
                                             <div className="bg-[#009f92]/10 rounded-lg p-4">
                                                 <Gift className="w-8 h-8 text-[#009f92] mx-auto mb-2" />
                                                 <p className="text-[#00777b] font-medium">
-                                                    恭喜完成所有集點！
+                                                    恭喜獲得獎勵！
                                                 </p>
                                                 <p className="text-[#009f92] text-sm mt-1">
                                                     您已完成本活動的所有打卡任務
