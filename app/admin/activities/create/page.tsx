@@ -46,8 +46,13 @@ interface CreateActivityFormData {
             notices: string[];
         };
         reward_threshold?: number;
+        reward_api?: {
+            issue_endpoint: string;
+            query_endpoint: string;
+        };
     };
     game_id?: string;
+    coupon_id?: string;
 }
 
 export default function CreateActivity() {
@@ -92,6 +97,9 @@ export default function CreateActivity() {
                         participation_info: formData.meta?.participation_info,
                         ...(formData.reward_mode === 'partial' && {
                             reward_threshold: formData.meta?.reward_threshold
+                        }),
+                        ...(formData.meta?.reward_api && {
+                            reward_api: formData.meta.reward_api
                         })
                     }
                 }
@@ -232,6 +240,76 @@ export default function CreateActivity() {
                                         placeholder="請輸入外部系統的 Game ID"
                                         required
                                     />
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="space-y-4">
+                            <div className="flex items-center justify-between">
+                                <label className="text-sm font-medium">需要獎勵機制？</label>
+                                <Switch
+                                    checked={!!formData.meta?.reward_api}
+                                    onCheckedChange={(checked) =>
+                                        setFormData({
+                                            ...formData,
+                                            meta: {
+                                                ...formData.meta,
+                                                reward_api: checked
+                                                    ? {
+                                                          issue_endpoint: '',
+                                                          query_endpoint: ''
+                                                      }
+                                                    : undefined
+                                            }
+                                        })
+                                    }
+                                />
+                            </div>
+
+                            {formData.meta?.reward_api && (
+                                <div className="space-y-4">
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium">Game ID</label>
+                                        <Input
+                                            value={formData.game_id || ''}
+                                            onChange={(e) => {
+                                                const gameId = e.target.value;
+                                                setFormData({
+                                                    ...formData,
+                                                    game_id: gameId,
+                                                    meta: {
+                                                        ...formData.meta,
+                                                        reward_api: {
+                                                            issue_endpoint: `https://games.travel3exp.xyz/api/games/${gameId}/coupons/${formData.coupon_id || ''}`,
+                                                            query_endpoint: `https://games.travel3exp.xyz/api/games/${gameId}/users/%{user_id}`
+                                                        }
+                                                    }
+                                                });
+                                            }}
+                                            placeholder="請輸入 Game ID"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium">Coupon ID</label>
+                                        <Input
+                                            value={formData.coupon_id || ''}
+                                            onChange={(e) => {
+                                                const couponId = e.target.value;
+                                                setFormData({
+                                                    ...formData,
+                                                    coupon_id: couponId,
+                                                    meta: {
+                                                        ...formData.meta,
+                                                        reward_api: {
+                                                            issue_endpoint: `https://games.travel3exp.xyz/api/games/${formData.game_id || ''}/coupons/${couponId}`,
+                                                            query_endpoint: `https://games.travel3exp.xyz/api/games/${formData.game_id || ''}/users/%{user_id}`
+                                                        }
+                                                    }
+                                                });
+                                            }}
+                                            placeholder="請輸入 Coupon ID"
+                                        />
+                                    </div>
                                 </div>
                             )}
                         </div>
