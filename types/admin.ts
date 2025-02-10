@@ -294,6 +294,7 @@ export interface CreateActivityFormData {
     reward_mode: RewardMode;
     meta?: ActivityMeta;
     game_id?: string;
+    coupon_id?: string;
 }
 
 export interface EditActivityFormData {
@@ -306,4 +307,6 @@ export interface EditActivityFormData {
     is_active: boolean;
     requires_contact_info: boolean;
     meta?: ActivityMeta;
+    game_id?: string;
+    coupon_id?: string;
 }

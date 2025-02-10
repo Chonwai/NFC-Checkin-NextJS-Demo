@@ -47,7 +47,13 @@ interface EditActivityFormData {
             requirements: ParticipationRequirement[];
             notices: string[];
         };
+        reward_api?: {
+            issue_endpoint: string;
+            query_endpoint: string;
+        };
     };
+    game_id?: string;
+    coupon_id?: string;
 }
 
 export default function EditActivityContent({ activityId }: { activityId: string }) {
@@ -75,15 +81,23 @@ export default function EditActivityContent({ activityId }: { activityId: string
 
     useEffect(() => {
         if (activity) {
+            let game_id = '';
+            let coupon_id = '';
+
+            if (activity.meta?.reward_api?.issue_endpoint) {
+                const matches = activity.meta.reward_api.issue_endpoint.match(
+                    /games\/(.*?)\/coupons\/(.*?)$/
+                );
+                if (matches) {
+                    game_id = matches[1];
+                    coupon_id = matches[2];
+                }
+            }
+
             setFormData({
                 ...activity,
-                meta: {
-                    ...activity.meta,
-                    participation_info: activity.meta?.participation_info || {
-                        requirements: [],
-                        notices: []
-                    }
-                }
+                game_id,
+                coupon_id
             });
         }
     }, [activity]);
@@ -233,6 +247,74 @@ export default function EditActivityContent({ activityId }: { activityId: string
                                 }
                             />
                         </div>
+
+                        <div className="flex items-center justify-between">
+                            <label className="text-sm font-medium">需要獎勵機制？</label>
+                            <Switch
+                                checked={!!formData.meta?.reward_api}
+                                onCheckedChange={(checked) =>
+                                    setFormData({
+                                        ...formData,
+                                        meta: {
+                                            ...formData.meta,
+                                            reward_api: checked
+                                                ? {
+                                                      issue_endpoint: `https://games.travel3exp.xyz/api/games/${formData.game_id || ''}/coupons/${formData.coupon_id || ''}`,
+                                                      query_endpoint: `https://games.travel3exp.xyz/api/games/${formData.game_id || ''}/users/%{user_id}`
+                                                  }
+                                                : undefined
+                                        }
+                                    })
+                                }
+                            />
+                        </div>
+
+                        {formData.meta?.reward_api && (
+                            <div className="space-y-4">
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium">Game ID</label>
+                                    <Input
+                                        value={formData.game_id || ''}
+                                        onChange={(e) => {
+                                            const gameId = e.target.value;
+                                            setFormData({
+                                                ...formData,
+                                                game_id: gameId,
+                                                meta: {
+                                                    ...formData.meta,
+                                                    reward_api: {
+                                                        issue_endpoint: `https://games.travel3exp.xyz/api/games/${gameId}/coupons/${formData.coupon_id || ''}`,
+                                                        query_endpoint: `https://games.travel3exp.xyz/api/games/${gameId}/users/%{user_id}`
+                                                    }
+                                                }
+                                            });
+                                        }}
+                                        placeholder="請輸入 Game ID"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium">Coupon ID</label>
+                                    <Input
+                                        value={formData.coupon_id || ''}
+                                        onChange={(e) => {
+                                            const couponId = e.target.value;
+                                            setFormData({
+                                                ...formData,
+                                                coupon_id: couponId,
+                                                meta: {
+                                                    ...formData.meta,
+                                                    reward_api: {
+                                                        issue_endpoint: `https://games.travel3exp.xyz/api/games/${formData.game_id || ''}/coupons/${couponId}`,
+                                                        query_endpoint: `https://games.travel3exp.xyz/api/games/${formData.game_id || ''}/users/%{user_id}`
+                                                    }
+                                                }
+                                            });
+                                        }}
+                                        placeholder="請輸入 Coupon ID"
+                                    />
+                                </div>
+                            </div>
+                        )}
 
                         <div className="space-y-4">
                             <div className="flex items-center justify-between">
