@@ -4,12 +4,14 @@ import { useActivity } from '@/hooks/useActivity';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { TrendingUp, Users, MapPin, Clock, FileText } from 'lucide-react';
+import { TrendingUp, Users, MapPin, Clock, FileText, Gift, XCircle } from 'lucide-react';
 import Link from 'next/link';
 import { ActivityStats } from '@/components/admin/activities/ActivityStats';
 import { ActivityParticipants } from '@/components/admin/activities/ActivityParticipants';
 import { ActivityLogs } from '@/components/admin/activities/ActivityLogs';
 import { useState } from 'react';
+import { Badge } from '@/components/ui/badge';
+import { getRewardModeColor } from '@/lib/reward-mode';
 
 export default function ActivityPage({ params }: any) {
     const [deviceId, setDeviceId] = useState<string | null>(null);
@@ -143,6 +145,59 @@ export default function ActivityPage({ params }: any) {
                                         {new Date(activity?.updated_at || '').toLocaleString()}
                                     </p>
                                 </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <h3 className="text-sm font-medium text-gray-500">獎勵機制</h3>
+                                <div className="flex items-center gap-2">
+                                    {activity?.meta?.reward_api ? (
+                                        <>
+                                            <Badge
+                                                className={`${getRewardModeColor(activity.reward_mode).bg} ${getRewardModeColor(activity.reward_mode).text} ${getRewardModeColor(activity.reward_mode).hover}`}
+                                            >
+                                                <Gift className="w-4 h-4 mr-1" />
+                                                {activity.reward_mode === 'full' && '全部完成'}
+                                                {activity.reward_mode === 'partial' && '部分完成'}
+                                                {activity.reward_mode === 'two_tier' && '兩階段'}
+                                                {activity.reward_mode === 'multi-tier' && '多階段'}
+                                            </Badge>
+                                            <div className="text-sm text-gray-600">
+                                                {activity.reward_mode === 'partial' && (
+                                                    <span className="ml-2">
+                                                        (需集滿 {activity.meta.reward_threshold} 點)
+                                                    </span>
+                                                )}
+                                                {activity.reward_mode === 'full' && (
+                                                    <span className="ml-2">(需完成所有打卡)</span>
+                                                )}
+                                                {activity.reward_mode === 'two_tier' && (
+                                                    <span className="ml-2">(兩階段獎勵)</span>
+                                                )}
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <Badge className="bg-gray-100 text-gray-800 hover:bg-gray-100">
+                                            <XCircle className="w-4 h-4 mr-1" />
+                                            無獎勵機制
+                                        </Badge>
+                                    )}
+                                </div>
+                                {activity?.meta?.reward_api && (
+                                    <div className="mt-2 space-y-1">
+                                        <div className="text-sm text-gray-600">
+                                            <span className="font-medium">發放端點：</span>
+                                            <code className="bg-gray-100 px-2 py-1 rounded text-sm break-all">
+                                                {activity.meta.reward_api.issue_endpoint}
+                                            </code>
+                                        </div>
+                                        <div className="text-sm text-gray-600">
+                                            <span className="font-medium">查詢端點：</span>
+                                            <code className="bg-gray-100 px-2 py-1 rounded text-sm break-all">
+                                                {activity.meta.reward_api.query_endpoint}
+                                            </code>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </CardContent>
                     </Card>
