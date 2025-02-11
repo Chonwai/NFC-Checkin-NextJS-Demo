@@ -235,6 +235,13 @@ export default function ActivityDetails({ params }: ActivityDetailsProps) {
 
                                 {/* 打卡地點列表 */}
                                 {activity.locations.map((location) => {
+                                    const locationCheckins = checkins?.filter(
+                                        (checkin) => checkin.location_id === location.id
+                                    );
+                                    const hasCheckedIn =
+                                        locationCheckins && locationCheckins.length > 0;
+                                    const checkinCount = locationCheckins?.length || 0;
+
                                     const locationIcon =
                                         location.check_in_icon_type === 'custom' &&
                                         location.check_in_icon_url ? (
@@ -246,7 +253,7 @@ export default function ActivityDetails({ params }: ActivityDetailsProps) {
                                                 className="w-8 h-8"
                                             />
                                         ) : (
-                                            <div className="bg-[#009f92] p-1.5 rounded-full">
+                                            <div className={`p-1.5 rounded-full bg-[#009f92]`}>
                                                 <Star className="w-5 h-5 text-white" />
                                             </div>
                                         );
@@ -266,12 +273,31 @@ export default function ActivityDetails({ params }: ActivityDetailsProps) {
                                             </div>
                                             <div className="flex items-center gap-2">
                                                 {locationIcon}
-                                                <Button
-                                                    className="bg-[#009f92] hover:bg-[#009f92]/90 text-white"
-                                                    size="sm"
-                                                >
-                                                    可打卡
-                                                </Button>
+                                                {activity.single_location_only ? (
+                                                    <Button
+                                                        className={`${
+                                                            hasCheckedIn &&
+                                                            checkinCount >= activity.check_in_limit
+                                                                ? 'bg-gray-400 hover:bg-gray-400/90'
+                                                                : 'bg-[#009f92] hover:bg-[#009f92]/90'
+                                                        } text-white`}
+                                                        size="sm"
+                                                    >
+                                                        {checkinCount}/{activity.check_in_limit}{' '}
+                                                        次打卡
+                                                    </Button>
+                                                ) : (
+                                                    <Button
+                                                        className={`${
+                                                            hasCheckedIn
+                                                                ? 'bg-gray-400 hover:bg-gray-400/90'
+                                                                : 'bg-[#009f92] hover:bg-[#009f92]/90'
+                                                        } text-white`}
+                                                        size="sm"
+                                                    >
+                                                        {hasCheckedIn ? '已打卡' : '可打卡'}
+                                                    </Button>
+                                                )}
                                             </div>
                                         </div>
                                     );

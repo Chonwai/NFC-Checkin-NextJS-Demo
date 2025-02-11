@@ -17,7 +17,7 @@ import { ActivityInfoModal } from '@/components/ActivityInfoModal';
 import { ContactInfoModal } from '@/components/ContactInfoModal';
 import { useContactInfo } from '@/hooks/useContactInfo';
 import Image from 'next/image';
-import { getDeviceId } from '@/lib/device';
+import { getDeviceId } from '@/lib/fingerprint';
 
 export default function CheckinSuccessContent() {
     const router = useRouter();
