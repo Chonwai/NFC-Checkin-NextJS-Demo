@@ -155,7 +155,17 @@ export default function CheckinSuccessContent() {
                 <ContactInfoModal
                     isOpen={showContactModal}
                     onClose={() => setShowContactModal(false)}
-                    onSubmit={(data) => submitContactInfo(data, activityId!)}
+                    activityId={activityId!}
+                    onSubmit={async (data) => {
+                        const result = await submitContactInfo(data, activityId!);
+                        if (result?.requiresVerification) {
+                            return { requiresVerification: true, message: result.message };
+                        }
+                        return {
+                            requiresVerification: false,
+                            message: result?.message || '提交成功'
+                        };
+                    }}
                 />
             )}
         </div>

@@ -10,7 +10,13 @@ interface ContactInfoData {
 }
 
 interface UseContactInfoResult {
-    submitContactInfo: (data: ContactInfoData, activityId: string) => Promise<void>;
+    submitContactInfo: (
+        data: ContactInfoData,
+        activityId: string
+    ) => Promise<{
+        requiresVerification: boolean;
+        message: string;
+    }>;
     isLoading: boolean;
     error: string | null;
     isSuccess: boolean;
@@ -47,15 +53,34 @@ export function useContactInfo(): UseContactInfoResult {
                 throw new Error(`Error: ${response.status}`);
             }
 
-            const responseData: ApiResponse<{ success: boolean }> = await response.json();
-            if (!responseData.success) {
-                throw new Error(responseData.error?.message || '提交失敗');
+            const responseData: ApiResponse<{
+                requires_verification?: boolean;
+                verification_error?: string;
+                verification_sent?: boolean;
+                message?: string;
+            }> = await response.json();
+
+            if (
+                responseData.data?.verification_error &&
+                responseData.data?.verification_sent === false
+            ) {
+                return {
+                    requiresVerification: false,
+                    message: responseData.data.verification_error
+                };
             }
 
-            setIsSuccess(true);
+            return {
+                requiresVerification: responseData.data?.requires_verification || false,
+                message: responseData.data?.message || '提交成功'
+            };
         } catch (err: any) {
             setError(err.message || '未知錯誤');
             setIsSuccess(false);
+            return {
+                requiresVerification: false,
+                message: '提交失敗'
+            };
         } finally {
             setIsLoading(false);
         }
