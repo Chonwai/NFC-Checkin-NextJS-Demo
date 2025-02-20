@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { ApiResponse } from '@/types/api';
-import { ParticipationRequirement } from '@/types/admin';
+import { ParticipationRequirement, VerificationSettings } from '@/types/admin';
 
 interface ActivityDetailsResponse
     extends ApiResponse<{
@@ -39,6 +39,7 @@ interface Activity {
         reward_threshold: number;
         reward_mode: string;
     };
+    verification_settings: VerificationSettings;
 }
 
 interface Location {

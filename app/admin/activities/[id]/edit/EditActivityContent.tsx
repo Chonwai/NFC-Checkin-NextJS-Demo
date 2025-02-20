@@ -716,11 +716,15 @@ export default function EditActivityContent({ activityId }: { activityId: string
                                         setFormData({
                                             ...formData,
                                             verification_settings: {
-                                                ...formData.verification_settings,
                                                 enabled: checked,
                                                 methods: checked
                                                     ? formData.verification_settings?.methods || []
-                                                    : []
+                                                    : [],
+                                                required:
+                                                    formData.verification_settings?.required ||
+                                                    false,
+                                                game_id:
+                                                    formData.verification_settings?.game_id || null
                                             }
                                         })
                                     }
@@ -748,8 +752,19 @@ export default function EditActivityContent({ activityId }: { activityId: string
                                                         setFormData({
                                                             ...formData,
                                                             verification_settings: {
-                                                                ...formData.verification_settings,
-                                                                methods: newMethods
+                                                                enabled:
+                                                                    formData.verification_settings
+                                                                        ?.enabled || false,
+                                                                methods: newMethods as (
+                                                                    | 'phone'
+                                                                    | 'email'
+                                                                )[],
+                                                                required:
+                                                                    formData.verification_settings
+                                                                        ?.required || false,
+                                                                game_id:
+                                                                    formData.verification_settings
+                                                                        ?.game_id || null
                                                             }
                                                         });
                                                     }}
@@ -773,8 +788,19 @@ export default function EditActivityContent({ activityId }: { activityId: string
                                                         setFormData({
                                                             ...formData,
                                                             verification_settings: {
-                                                                ...formData.verification_settings,
-                                                                methods: newMethods
+                                                                enabled:
+                                                                    formData.verification_settings
+                                                                        ?.enabled || false,
+                                                                methods: newMethods as (
+                                                                    | 'phone'
+                                                                    | 'email'
+                                                                )[],
+                                                                required:
+                                                                    formData.verification_settings
+                                                                        ?.required || false,
+                                                                game_id:
+                                                                    formData.verification_settings
+                                                                        ?.game_id || null
                                                             }
                                                         });
                                                     }}
@@ -795,7 +821,15 @@ export default function EditActivityContent({ activityId }: { activityId: string
                                                     setFormData({
                                                         ...formData,
                                                         verification_settings: {
-                                                            ...formData.verification_settings,
+                                                            enabled:
+                                                                formData.verification_settings
+                                                                    ?.enabled || false,
+                                                            methods:
+                                                                formData.verification_settings
+                                                                    ?.methods || [],
+                                                            required:
+                                                                formData.verification_settings
+                                                                    ?.required || false,
                                                             game_id: e.target.value
                                                         }
                                                     })
@@ -813,8 +847,16 @@ export default function EditActivityContent({ activityId }: { activityId: string
                                                 setFormData({
                                                     ...formData,
                                                     verification_settings: {
-                                                        ...formData.verification_settings,
-                                                        required: checked
+                                                        enabled:
+                                                            formData.verification_settings
+                                                                ?.enabled || false,
+                                                        methods:
+                                                            formData.verification_settings
+                                                                ?.methods || [],
+                                                        required: checked,
+                                                        game_id:
+                                                            formData.verification_settings
+                                                                ?.game_id || null
                                                     }
                                                 })
                                             }

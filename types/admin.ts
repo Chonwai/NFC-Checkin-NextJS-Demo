@@ -266,13 +266,13 @@ export interface ParticipationInfo {
     notices: string[];
 }
 
-export type RewardMode = 'full' | 'partial' | 'two_tier' | 'multi-tier';
+export type RewardMode = 'full' | 'partial' | 'two_tier' | 'multi_tier';
 
 export interface VerificationSettings {
     enabled: boolean;
     methods: ('phone' | 'email')[];
     required: boolean;
-    game_id?: string;
+    game_id: string | null;
 }
 
 export interface ActivityMeta {
@@ -299,7 +299,8 @@ export interface CreateActivityFormData {
     single_location_only: boolean;
     is_active: boolean;
     requires_contact_info: boolean;
-    reward_mode: RewardMode;
+    reward_mode?: RewardMode;
+    verification_settings: VerificationSettings;
     meta?: ActivityMeta;
     game_id?: string;
     coupon_id?: string;
