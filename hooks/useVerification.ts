@@ -4,6 +4,17 @@ import { useState } from 'react';
 import { getDeviceId } from '@/lib/fingerprint';
 import { ApiResponse } from '@/types/api';
 
+interface VerificationResponse {
+    success: boolean;
+    error?: {
+        message: string | string[];
+        code?: string;
+        details?: {
+            code: string;
+        };
+    };
+}
+
 export function useVerification(activityId: string) {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -11,44 +22,27 @@ export function useVerification(activityId: string) {
     const verifyCode = async (code: string) => {
         setIsLoading(true);
         try {
-            const response = await fetch(
-                `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/activities/${activityId}/temp_users/verify_code`,
-                {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Temp-User-Token': await getDeviceId()
-                    },
-                    body: JSON.stringify({ code })
-                }
-            );
+            const response = await fetch(`/api/activities/${activityId}/verify`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ code })
+            });
 
-            const responseData: ApiResponse<{
-                success?: boolean;
-                error?: {
-                    message: Array<{ code: string; message: any }>;
-                };
-            }> = await response.json();
+            const responseData: VerificationResponse = await response.json();
 
             if (!response.ok || !responseData.success) {
-                throw new Error(responseData.error?.message?.[0]?.message || '驗證碼錯誤');
+                // 處理錯誤訊息可能是字串或字串陣列的情況
+                const errorMessage = Array.isArray(responseData.error?.message)
+                    ? responseData.error.message[0]
+                    : responseData.error?.message || '驗證碼錯誤';
+                throw new Error(errorMessage);
             }
 
             return responseData;
-
-            // if (!response.ok) {
-            //     throw new Error('驗證碼錯誤');
-            // }
-
-            // const data: ApiResponse<{
-            //     requires_verification?: boolean;
-            //     verification_sent?: boolean;
-            //     message?: string;
-            // }> = await response.json();
-            // return data;
-        } catch (err: any) {
-            setError(err.message);
-            throw err;
+        } catch (error) {
+            throw error;
         } finally {
             setIsLoading(false);
         }
@@ -70,13 +64,12 @@ export function useVerification(activityId: string) {
             const data: ApiResponse<{
                 verification_sent?: boolean;
                 verification_error?: string;
-                status?: string;
                 requires_verification?: boolean;
                 message?: string;
             }> = await response.json();
 
-            if (!response.ok || data?.status !== 'ok') {
-                throw new Error(data?.message || '發送失敗');
+            if (!response.ok || !data.success) {
+                throw new Error(data?.error?.message || '發送失敗');
             }
 
             return data;

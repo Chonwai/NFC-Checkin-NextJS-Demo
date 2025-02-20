@@ -82,7 +82,8 @@ export function ContactInfoModal({ isOpen, onClose, activityId, onSubmit }: Cont
             const result = await verifyCode(verificationCode);
 
             if (!result.success) {
-                const errorMessage = result.error?.message?.[0]?.message || '驗證碼錯誤';
+                const errorMessage =
+                    typeof result.error?.message === 'string' ? result.error.message : '驗證碼錯誤';
                 throw new Error(errorMessage);
             }
 
