@@ -16,7 +16,7 @@ import {
     formatUTCToZonedInput,
     formatInputToUTC
 } from '@/utils/dateTime';
-import { ActivityMeta, ParticipationRequirement } from '@/types/admin';
+import { ActivityMeta, ParticipationRequirement, VerificationSettings } from '@/types/admin';
 import {
     Select,
     SelectContent,
@@ -28,6 +28,7 @@ import { Plus, Trash2, Eye } from 'lucide-react';
 import { PARTICIPATION_TEMPLATES } from '@/constants/participationTemplates';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { ActivityInfoModal } from '@/components/ActivityInfoModal';
+import { Checkbox } from '@/components/ui/checkbox';
 
 interface EditActivityFormData {
     name: string;
@@ -51,9 +52,11 @@ interface EditActivityFormData {
             issue_endpoint: string;
             query_endpoint: string;
         };
+        verification_settings?: VerificationSettings;
     };
     game_id?: string;
     coupon_id?: string;
+    verification_settings?: VerificationSettings;
 }
 
 export default function EditActivityContent({ activityId }: { activityId: string }) {
@@ -75,6 +78,12 @@ export default function EditActivityContent({ activityId }: { activityId: string
             participation_info: {
                 requirements: [],
                 notices: []
+            },
+            verification_settings: {
+                enabled: false,
+                methods: [],
+                required: false,
+                game_id: ''
             }
         }
     });
@@ -94,33 +103,82 @@ export default function EditActivityContent({ activityId }: { activityId: string
                 }
             }
 
+            // 使用根層級的 verification_settings
+            const verification_settings = activity.verification_settings || {
+                enabled: false,
+                methods: [],
+                required: false,
+                game_id: null
+            };
+
             setFormData({
                 ...activity,
                 game_id,
-                coupon_id
+                coupon_id,
+                meta: {
+                    ...activity.meta,
+                    verification_settings: undefined // 清除 meta 中的 verification_settings
+                },
+                verification_settings // 使用根層級的 verification_settings
             });
         }
     }, [activity]);
 
+    const validateVerificationSettings = (settings?: VerificationSettings) => {
+        if (!settings?.enabled) return true;
+
+        if (settings.methods.length === 0) {
+            toast({
+                title: '驗證設置錯誤',
+                description: '啟用驗證時必須選擇至少一種驗證方式',
+                variant: 'destructive'
+            });
+            return false;
+        }
+
+        if (settings.methods.includes('phone') && !settings.game_id) {
+            toast({
+                title: '驗證設置錯誤',
+                description: '啟用手機驗證時必須設置 Game ID',
+                variant: 'destructive'
+            });
+            return false;
+        }
+
+        if (settings.required && settings.methods.length === 0) {
+            toast({
+                title: '驗證設置錯誤',
+                description: '啟用必要驗證時必須選擇至少一種驗證方法',
+                variant: 'destructive'
+            });
+            return false;
+        }
+
+        return true;
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        if (!validateVerificationSettings(formData.verification_settings)) {
+            return;
+        }
+
         try {
             const payload = {
-                ...formData,
-                start_date: formatInputToUTC(formData.start_date),
-                end_date: formatInputToUTC(formData.end_date),
-                meta: {
-                    ...formData.meta,
-                    participation_info: formData.meta?.participation_info || {
-                        requirements: [],
-                        notices: []
+                activity: {
+                    ...formData,
+                    start_date: formatInputToUTC(formData.start_date),
+                    end_date: formatInputToUTC(formData.end_date),
+                    verification_settings: formData.verification_settings, // 直接使用根層級的 verification_settings
+                    meta: {
+                        ...formData.meta,
+                        verification_settings: undefined // 確保 meta 中沒有 verification_settings
                     }
                 }
             };
 
-            const response = await updateActivity(activityId, {
-                activity: payload
-            });
+            const response = await updateActivity(activityId, payload);
 
             if (response.success) {
                 toast({
@@ -645,6 +703,125 @@ export default function EditActivityContent({ activityId }: { activityId: string
                                     )
                                 )}
                             </div>
+                        </div>
+
+                        <div className="space-y-4">
+                            <h3 className="text-lg font-medium">驗證設置</h3>
+
+                            <div className="flex items-center justify-between">
+                                <label className="text-sm font-medium">啟用驗證</label>
+                                <Switch
+                                    checked={formData.verification_settings?.enabled}
+                                    onCheckedChange={(checked) =>
+                                        setFormData({
+                                            ...formData,
+                                            verification_settings: {
+                                                ...formData.verification_settings,
+                                                enabled: checked,
+                                                methods: checked
+                                                    ? formData.verification_settings?.methods || []
+                                                    : []
+                                            }
+                                        })
+                                    }
+                                />
+                            </div>
+
+                            {formData.verification_settings?.enabled && (
+                                <>
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium">驗證方式</label>
+                                        <div className="flex gap-4">
+                                            <div className="flex items-center gap-2">
+                                                <Checkbox
+                                                    checked={formData.verification_settings?.methods.includes(
+                                                        'phone'
+                                                    )}
+                                                    onCheckedChange={(checked) => {
+                                                        const methods =
+                                                            formData.verification_settings
+                                                                ?.methods || [];
+                                                        const newMethods = checked
+                                                            ? [...methods, 'phone']
+                                                            : methods.filter((m) => m !== 'phone');
+
+                                                        setFormData({
+                                                            ...formData,
+                                                            verification_settings: {
+                                                                ...formData.verification_settings,
+                                                                methods: newMethods
+                                                            }
+                                                        });
+                                                    }}
+                                                />
+                                                <label>手機驗證</label>
+                                            </div>
+
+                                            <div className="flex items-center gap-2">
+                                                <Checkbox
+                                                    checked={formData.verification_settings?.methods.includes(
+                                                        'email'
+                                                    )}
+                                                    onCheckedChange={(checked) => {
+                                                        const methods =
+                                                            formData.verification_settings
+                                                                ?.methods || [];
+                                                        const newMethods = checked
+                                                            ? [...methods, 'email']
+                                                            : methods.filter((m) => m !== 'email');
+
+                                                        setFormData({
+                                                            ...formData,
+                                                            verification_settings: {
+                                                                ...formData.verification_settings,
+                                                                methods: newMethods
+                                                            }
+                                                        });
+                                                    }}
+                                                />
+                                                <label>電子郵件驗證</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {formData.verification_settings?.methods.includes('phone') && (
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium">Game ID</label>
+                                            <Input
+                                                value={
+                                                    formData.verification_settings?.game_id || ''
+                                                }
+                                                onChange={(e) =>
+                                                    setFormData({
+                                                        ...formData,
+                                                        verification_settings: {
+                                                            ...formData.verification_settings,
+                                                            game_id: e.target.value
+                                                        }
+                                                    })
+                                                }
+                                                placeholder="請輸入手機驗證用的 Game ID"
+                                            />
+                                        </div>
+                                    )}
+
+                                    <div className="flex items-center justify-between">
+                                        <label className="text-sm font-medium">必須驗證</label>
+                                        <Switch
+                                            checked={formData.verification_settings?.required}
+                                            onCheckedChange={(checked) =>
+                                                setFormData({
+                                                    ...formData,
+                                                    verification_settings: {
+                                                        ...formData.verification_settings,
+                                                        required: checked
+                                                    }
+                                                })
+                                            }
+                                        />
+                                    </div>
+                                </>
+                            )}
                         </div>
 
                         <div className="flex justify-end gap-4">

@@ -268,7 +268,16 @@ export interface ParticipationInfo {
 
 export type RewardMode = 'full' | 'partial' | 'two_tier' | 'multi-tier';
 
+export interface VerificationSettings {
+    enabled: boolean;
+    methods: ('phone' | 'email')[];
+    required: boolean;
+    game_id?: string;
+}
+
 export interface ActivityMeta {
+    verification_settings?: VerificationSettings;
+    participation_info?: ParticipationInfo;
     reward_api?: {
         issue_endpoint: string;
         query_endpoint: string;
@@ -276,7 +285,6 @@ export interface ActivityMeta {
     subscription_api?: {
         game_id: string;
     };
-    participation_info?: ParticipationInfo;
     reward_threshold?: number;
     secondary_threshold?: number;
     final_threshold?: number;

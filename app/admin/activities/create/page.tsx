@@ -27,8 +27,9 @@ import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { ActivityInfoModal } from '@/components/ActivityInfoModal';
 import { Plus, Eye, Trash2 } from 'lucide-react';
 import { PARTICIPATION_TEMPLATES } from '@/constants/participationTemplates';
-import { ParticipationRequirement } from '@/types/admin';
+import { ParticipationRequirement, VerificationSettings } from '@/types/admin';
 import { RewardMode } from '@/types/admin';
+import { Checkbox } from '@/components/ui/checkbox';
 
 interface CreateActivityFormData {
     name: string;
@@ -40,6 +41,7 @@ interface CreateActivityFormData {
     is_active: boolean;
     requires_contact_info: boolean;
     reward_mode: RewardMode;
+    verification_settings: VerificationSettings;
     meta: {
         participation_info: {
             requirements: ParticipationRequirement[];
@@ -62,13 +64,19 @@ export default function CreateActivity() {
     const [formData, setFormData] = useState<CreateActivityFormData>({
         name: '',
         description: '',
-        start_date: formatUTCToZonedInput(dayjs().format()),
-        end_date: formatUTCToZonedInput(dayjs().add(7, 'day').format()),
+        start_date: '',
+        end_date: '',
         check_in_limit: 1,
         single_location_only: true,
         is_active: true,
         requires_contact_info: false,
         reward_mode: 'full',
+        verification_settings: {
+            enabled: false,
+            methods: [],
+            required: false,
+            game_id: ''
+        },
         meta: {
             participation_info: {
                 requirements: [],
@@ -86,6 +94,7 @@ export default function CreateActivity() {
                     ...formData,
                     start_date: formatInputToUTC(formData.start_date),
                     end_date: formatInputToUTC(formData.end_date),
+                    verification_settings: formData.verification_settings,
                     meta: {
                         ...(formData.requires_contact_info
                             ? {
@@ -665,6 +674,131 @@ export default function CreateActivity() {
                                     )
                                 )}
                             </div>
+                        </div>
+
+                        <div className="space-y-4">
+                            <h3 className="text-lg font-medium">驗證設置</h3>
+
+                            <div className="flex items-center justify-between">
+                                <label className="text-sm font-medium">啟用驗證</label>
+                                <Switch
+                                    checked={formData.verification_settings?.enabled}
+                                    onCheckedChange={(checked) =>
+                                        setFormData({
+                                            ...formData,
+                                            verification_settings: {
+                                                ...formData.verification_settings,
+                                                enabled: checked,
+                                                methods: checked
+                                                    ? formData.verification_settings?.methods || []
+                                                    : []
+                                            }
+                                        })
+                                    }
+                                />
+                            </div>
+
+                            {formData.verification_settings?.enabled && (
+                                <>
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium">驗證方式</label>
+                                        <div className="flex gap-4">
+                                            <div className="flex items-center gap-2">
+                                                <Checkbox
+                                                    checked={formData.verification_settings?.methods.includes(
+                                                        'phone'
+                                                    )}
+                                                    onCheckedChange={(checked) => {
+                                                        const methods =
+                                                            formData.verification_settings
+                                                                ?.methods || [];
+                                                        const newMethods = checked
+                                                            ? [...methods, 'phone']
+                                                            : methods.filter((m) => m !== 'phone');
+
+                                                        setFormData({
+                                                            ...formData,
+                                                            verification_settings: {
+                                                                ...formData.verification_settings,
+                                                                methods: newMethods as (
+                                                                    | 'phone'
+                                                                    | 'email'
+                                                                )[]
+                                                            }
+                                                        });
+                                                    }}
+                                                />
+                                                <label>手機驗證</label>
+                                            </div>
+
+                                            <div className="flex items-center gap-2">
+                                                <Checkbox
+                                                    checked={formData.verification_settings?.methods.includes(
+                                                        'email'
+                                                    )}
+                                                    onCheckedChange={(checked) => {
+                                                        const methods =
+                                                            formData.verification_settings
+                                                                ?.methods || [];
+                                                        const newMethods = checked
+                                                            ? [...methods, 'email']
+                                                            : methods.filter((m) => m !== 'email');
+
+                                                        setFormData({
+                                                            ...formData,
+                                                            verification_settings: {
+                                                                ...formData.verification_settings,
+                                                                methods: newMethods as (
+                                                                    | 'phone'
+                                                                    | 'email'
+                                                                )[]
+                                                            }
+                                                        });
+                                                    }}
+                                                />
+                                                <label>電子郵件驗證</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {formData.verification_settings?.methods.includes('phone') && (
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium">Game ID</label>
+                                            <Input
+                                                value={
+                                                    formData.verification_settings?.game_id || ''
+                                                }
+                                                onChange={(e) =>
+                                                    setFormData({
+                                                        ...formData,
+                                                        verification_settings: {
+                                                            ...formData.verification_settings,
+                                                            game_id: e.target.value
+                                                        }
+                                                    })
+                                                }
+                                                placeholder="請輸入手機驗證用的 Game ID"
+                                            />
+                                        </div>
+                                    )}
+
+                                    <div className="flex items-center justify-between">
+                                        <label className="text-sm font-medium">必須驗證</label>
+                                        <Switch
+                                            checked={formData.verification_settings?.required}
+                                            onCheckedChange={(checked) =>
+                                                setFormData({
+                                                    ...formData,
+                                                    verification_settings: {
+                                                        ...formData.verification_settings,
+                                                        required: checked
+                                                    }
+                                                })
+                                            }
+                                        />
+                                    </div>
+                                </>
+                            )}
                         </div>
 
                         <div className="flex justify-end gap-4">
