@@ -19,16 +19,23 @@ export function useVerification(activityId: string) {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const verifyCode = async (code: string) => {
+    const verifyCode = async (code: string, verificationType: 'phone' | 'email') => {
         setIsLoading(true);
         try {
-            const response = await fetch(`/api/activities/${activityId}/verify`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ code })
-            });
+            const response = await fetch(
+                `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/activities/${activityId}/temp_users/verify_code`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Temp-User-Token': await getDeviceId()
+                    },
+                    body: JSON.stringify({
+                        verification_type: verificationType,
+                        code
+                    })
+                }
+            );
 
             const responseData: VerificationResponse = await response.json();
 
@@ -48,7 +55,7 @@ export function useVerification(activityId: string) {
         }
     };
 
-    const resendVerification = async () => {
+    const resendVerification = async (verificationType: 'phone' | 'email') => {
         setIsLoading(true);
         try {
             const response = await fetch(
@@ -56,8 +63,12 @@ export function useVerification(activityId: string) {
                 {
                     method: 'POST',
                     headers: {
+                        'Content-Type': 'application/json',
                         'X-Temp-User-Token': await getDeviceId()
-                    }
+                    },
+                    body: JSON.stringify({
+                        verification_type: verificationType
+                    })
                 }
             );
 

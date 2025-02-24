@@ -17,8 +17,14 @@ interface ContactInfoModalProps {
     isOpen: boolean;
     onClose: () => void;
     activityId: string;
+    verificationSettings: {
+        enabled: boolean;
+        methods: ('phone' | 'email')[];
+        required: boolean;
+        game_id: string | null;
+    };
     onSubmit: (contactInfo: { phone?: string; email?: string }) => Promise<{
-        requiresVerification: boolean;
+        success: boolean;
         message: string;
         verification_error?: string;
         verification_sent?: boolean;
@@ -29,7 +35,13 @@ interface ContactInfoModalProps {
 const PHONE_REGEX = /^[2-9]\d{7}$/; // 手機號碼格式：8位數字，首位不為0或1
 const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
-export function ContactInfoModal({ isOpen, onClose, activityId, onSubmit }: ContactInfoModalProps) {
+export function ContactInfoModal({
+    isOpen,
+    onClose,
+    activityId,
+    verificationSettings,
+    onSubmit
+}: ContactInfoModalProps) {
     const [phone, setPhone] = useState('');
     const [email, setEmail] = useState('');
     const [phoneError, setPhoneError] = useState('');
@@ -79,7 +91,9 @@ export function ContactInfoModal({ isOpen, onClose, activityId, onSubmit }: Cont
         }
 
         try {
-            const result = await verifyCode(verificationCode);
+            // 根據用戶輸入的內容決定驗證類型
+            const verificationType = phone ? 'phone' : 'email';
+            const result = await verifyCode(verificationCode, verificationType);
 
             if (!result.success) {
                 const errorMessage =
@@ -101,7 +115,10 @@ export function ContactInfoModal({ isOpen, onClose, activityId, onSubmit }: Cont
 
     const handleResend = async () => {
         try {
-            const result = await resendVerification();
+            // 根據用戶輸入的內容決定驗證類型
+            const verificationType = phone ? 'phone' : 'email';
+            const result = await resendVerification(verificationType);
+
             if (result.data?.verification_sent === false) {
                 throw new Error(result.data?.message || '驗證碼發送失敗');
             }
@@ -125,7 +142,28 @@ export function ContactInfoModal({ isOpen, onClose, activityId, onSubmit }: Cont
         const isPhoneValid = phone ? validatePhone(phone) : true;
         const isEmailValid = email ? validateEmail(email) : true;
 
-        if (!phone && !email) {
+        // 根據 verification_settings 檢查輸入的聯絡方式是否符合要求
+        if (verificationSettings.enabled) {
+            const hasValidContactMethod = verificationSettings.methods.some((method) => {
+                if (method === 'phone') return !!phone;
+                if (method === 'email') return !!email;
+                return false;
+            });
+
+            if (!hasValidContactMethod) {
+                toast({
+                    title: '請填寫資料',
+                    description: `請提供${verificationSettings.methods.includes('phone') ? '手機號碼' : ''}${
+                        verificationSettings.methods.includes('phone') &&
+                        verificationSettings.methods.includes('email')
+                            ? '或'
+                            : ''
+                    }${verificationSettings.methods.includes('email') ? '電子郵件' : ''}`,
+                    variant: 'destructive'
+                });
+                return;
+            }
+        } else if (!phone && !email) {
             toast({
                 title: '請填寫資料',
                 description: '請至少提供一種聯絡方式',
@@ -141,7 +179,8 @@ export function ContactInfoModal({ isOpen, onClose, activityId, onSubmit }: Cont
         setIsSubmitting(true);
         try {
             const result = await onSubmit({ phone, email });
-            if (result.message.includes('失敗') || result.verification_error) {
+
+            if (!result.success) {
                 toast({
                     title: '提交失敗',
                     description: result.message,
@@ -150,7 +189,7 @@ export function ContactInfoModal({ isOpen, onClose, activityId, onSubmit }: Cont
                 return;
             }
 
-            if (result.requiresVerification) {
+            if (verificationSettings.enabled) {
                 setShowVerification(true);
                 setCountdown(60);
                 toast({ title: '驗證碼已發送', description: result.message });
@@ -205,9 +244,17 @@ export function ContactInfoModal({ isOpen, onClose, activityId, onSubmit }: Cont
                             {verificationError && (
                                 <p className="text-sm text-red-500 mt-1">{verificationError}</p>
                             )}
-                            <p className="text-sm text-[#009f92] mt-2">
-                                {countdown > 0 ? `${countdown}秒後可重新發送` : '未收到驗證碼？'}
-                            </p>
+                            <div className="space-y-1 mt-2">
+                                <p className="text-sm text-[#009f92]">
+                                    {countdown > 0
+                                        ? `${countdown}秒後可重新發送`
+                                        : '未收到驗證碼？'}
+                                </p>
+                                <p className="text-xs text-[#666666]">• 驗證碼將於10分鐘後失效</p>
+                                <p className="text-xs text-[#666666]">
+                                    • 請確認是否收到來自系統的驗證訊息
+                                </p>
+                            </div>
                         </div>
                         <Button
                             className="w-full bg-[#009f92] hover:bg-[#009f92]/90 text-white"
@@ -228,30 +275,40 @@ export function ContactInfoModal({ isOpen, onClose, activityId, onSubmit }: Cont
                     </div>
                 ) : (
                     <div className="space-y-4">
-                        <div>
-                            <label className="text-sm text-[#00777b]">手機號碼</label>
-                            <Input
-                                type="tel"
-                                placeholder="請輸入8位數字的手機號碼"
-                                value={phone}
-                                onChange={handlePhoneChange}
-                                className={`bg-white ${phoneError ? 'border-red-500' : ''}`}
-                            />
-                            {phoneError && (
-                                <p className="text-sm text-red-500 mt-1">{phoneError}</p>
-                            )}
-                        </div>
-                        {/* <div>
-                            <label className="text-sm text-[#00777b]">電子郵件</label>
-                            <Input
-                                type="email"
-                                placeholder="請輸入有效的電子郵件地址"
-                                value={email}
-                                onChange={handleEmailChange}
-                                className={`bg-white ${emailError ? 'border-red-500' : ''}`}
-                            />
-                            {emailError && <p className="text-sm text-red-500 mt-1">{emailError}</p>}
-                        </div> */}
+                        {/* 只在 methods 包含 phone 時顯示手機輸入 */}
+                        {verificationSettings.methods.includes('phone') && (
+                            <div>
+                                <label className="text-sm text-[#00777b]">手機號碼</label>
+                                <Input
+                                    type="tel"
+                                    placeholder="請輸入8位數字的手機號碼"
+                                    value={phone}
+                                    onChange={handlePhoneChange}
+                                    className={`bg-white ${phoneError ? 'border-red-500' : ''}`}
+                                />
+                                {phoneError && (
+                                    <p className="text-sm text-red-500 mt-1">{phoneError}</p>
+                                )}
+                            </div>
+                        )}
+
+                        {/* 只在 methods 包含 email 時顯示郵件輸入 */}
+                        {verificationSettings.methods.includes('email') && (
+                            <div>
+                                <label className="text-sm text-[#00777b]">電子郵件</label>
+                                <Input
+                                    type="email"
+                                    placeholder="請輸入有效的電子郵件地址"
+                                    value={email}
+                                    onChange={handleEmailChange}
+                                    className={`bg-white ${emailError ? 'border-red-500' : ''}`}
+                                />
+                                {emailError && (
+                                    <p className="text-sm text-red-500 mt-1">{emailError}</p>
+                                )}
+                            </div>
+                        )}
+
                         <Button
                             className="w-full bg-[#009f92] hover:bg-[#009f92]/90 text-white"
                             onClick={handleSubmit}
