@@ -6,6 +6,7 @@ import { ApiResponse } from '@/types/api';
 
 interface ContactInfoData {
     phone?: string;
+    phone_country_code?: string;
     email?: string;
 }
 
@@ -43,6 +44,7 @@ export function useContactInfo(): UseContactInfoResult {
                     body: JSON.stringify({
                         temp_user: {
                             phone: data.phone,
+                            phone_country_code: data.phone_country_code,
                             email: data.email
                         }
                     })
