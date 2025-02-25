@@ -115,7 +115,6 @@ export function ContactInfoModal({
 
     const handleResend = async () => {
         try {
-            // 根據用戶輸入的內容決定驗證類型
             const verificationType = phone ? 'phone' : 'email';
             const result = await resendVerification(verificationType);
 
@@ -133,16 +132,20 @@ export function ContactInfoModal({
         }
     };
 
+    const handleBackToContact = () => {
+        setVerificationCode('');
+        setVerificationError('');
+        setShowVerification(false);
+        setCountdown(0);
+    };
+
     const handleSubmit = async () => {
-        // 重置錯誤信息
         setPhoneError('');
         setEmailError('');
 
-        // 驗證輸入
         const isPhoneValid = phone ? validatePhone(phone) : true;
         const isEmailValid = email ? validateEmail(email) : true;
 
-        // 根據 verification_settings 檢查輸入的聯絡方式是否符合要求
         if (verificationSettings.enabled) {
             const hasValidContactMethod = verificationSettings.methods.some((method) => {
                 if (method === 'phone') return !!phone;
@@ -209,10 +212,15 @@ export function ContactInfoModal({
     };
 
     useEffect(() => {
+        let interval: ReturnType<typeof setInterval>;
         if (countdown > 0) {
-            const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
-            return () => clearTimeout(timer);
+            interval = setInterval(() => {
+                setCountdown((prev) => prev - 1);
+            }, 1000);
         }
+        return () => {
+            if (interval) clearInterval(interval);
+        };
     }, [countdown]);
 
     return (
@@ -229,7 +237,7 @@ export function ContactInfoModal({
 
                 {showVerification ? (
                     <div className="space-y-4">
-                        <div>
+                        <div className="space-y-2">
                             <label className="text-sm text-[#00777b]">驗證碼</label>
                             <Input
                                 type="text"
@@ -256,18 +264,29 @@ export function ContactInfoModal({
                                 </p>
                             </div>
                         </div>
+
                         <Button
                             className="w-full bg-[#009f92] hover:bg-[#009f92]/90 text-white"
                             onClick={handleVerify}
-                            disabled={isSubmitting}
+                            disabled={isVerifying}
                         >
-                            {isSubmitting ? '驗證中...' : '確認驗證碼'}
+                            {isVerifying ? '驗證中...' : '確認驗證碼'}
                         </Button>
+
+                        <Button
+                            variant="outline"
+                            className="w-full border-[#009f92] text-[#009f92]"
+                            onClick={handleBackToContact}
+                        >
+                            返回修改聯絡方式
+                        </Button>
+
                         {countdown === 0 && (
                             <Button
                                 variant="outline"
                                 className="w-full text-[#009f92] border-[#009f92]"
                                 onClick={handleResend}
+                                disabled={isVerifying}
                             >
                                 重新發送驗證碼
                             </Button>
@@ -275,7 +294,6 @@ export function ContactInfoModal({
                     </div>
                 ) : (
                     <div className="space-y-4">
-                        {/* 只在 methods 包含 phone 時顯示手機輸入 */}
                         {verificationSettings.methods.includes('phone') && (
                             <div>
                                 <label className="text-sm text-[#00777b]">手機號碼</label>
@@ -292,7 +310,6 @@ export function ContactInfoModal({
                             </div>
                         )}
 
-                        {/* 只在 methods 包含 email 時顯示郵件輸入 */}
                         {verificationSettings.methods.includes('email') && (
                             <div>
                                 <label className="text-sm text-[#00777b]">電子郵件</label>
@@ -307,6 +324,38 @@ export function ContactInfoModal({
                                     <p className="text-sm text-red-500 mt-1">{emailError}</p>
                                 )}
                             </div>
+                        )}
+
+                        {(!verificationSettings.enabled ||
+                            verificationSettings.methods.length === 0) && (
+                            <>
+                                <div>
+                                    <label className="text-sm text-[#00777b]">手機號碼</label>
+                                    <Input
+                                        type="tel"
+                                        placeholder="請輸入8位數字的手機號碼"
+                                        value={phone}
+                                        onChange={handlePhoneChange}
+                                        className={`bg-white ${phoneError ? 'border-red-500' : ''}`}
+                                    />
+                                    {phoneError && (
+                                        <p className="text-sm text-red-500 mt-1">{phoneError}</p>
+                                    )}
+                                </div>
+                                <div>
+                                    <label className="text-sm text-[#00777b]">電子郵件</label>
+                                    <Input
+                                        type="email"
+                                        placeholder="請輸入有效的電子郵件地址"
+                                        value={email}
+                                        onChange={handleEmailChange}
+                                        className={`bg-white ${emailError ? 'border-red-500' : ''}`}
+                                    />
+                                    {emailError && (
+                                        <p className="text-sm text-red-500 mt-1">{emailError}</p>
+                                    )}
+                                </div>
+                            </>
                         )}
 
                         <Button
